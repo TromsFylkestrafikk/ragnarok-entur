@@ -1,0 +1,66 @@
+{
+    "name": "ragnarok/ragnarok-entur",
+    "description": "Ragnarok entur datasink",
+    "type": "library",
+    "license": "GPL-3.0-or-later",
+    "keywords": [],
+    "authors": [
+        {
+            "name": "Kåre Slettnes",
+            "email": "kaare.slettnes@tromsfylke.no"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.0",
+        "illuminate/console": "^10.0",
+        "illuminate/database": "^10.0",
+        "illuminate/support": "^10.0",
+        "ragnarok/sink": "dev-main",
+        "tromsfylkestrafikk/laravel-netex": "dev-master"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.6",
+        "phpmd/phpmd": "@stable",
+        "phpstan/phpstan": "^1.10",
+        "larastan/larastan": "^2.6",
+        "orchestra/testbench": "^8.5",
+        "orchestra/canvas": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ragnarok\\Entur\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ragnarok\\Entur\\Tests\\":"tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/TromsFylkestrafikk/christmas-tree-parser"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/tromsfylkestrafikk/ragnarok-sink"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/tromsfylkestrafikk/laravel-netex"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ragnarok\\Entur\\RagnarokEnturServiceProvider"
+            ]
+        }
+    }
+}

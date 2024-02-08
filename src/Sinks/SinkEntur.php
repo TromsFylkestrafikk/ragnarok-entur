@@ -88,6 +88,35 @@ class SinkEntur extends SinkBase
     }
 
     /**
+     * Get available chunk IDs.
+     *
+     * EnTur does not have an available route set history, so we need to build
+     * this ourselves. Only previously stored files are available as chunk IDs.
+     * And today's route set.
+     *
+     * @return array
+     */
+    public function getChunkIds(): array
+    {
+        $filenames = SinkFile::select('name')
+            ->where('sink_id', self::$id)
+            ->orderBy('name')
+            ->get()
+            ->keyBy('name')
+            ->pluck('name')
+            ->toArray();
+        $today = today()->format('Y-m-d');
+        $chunkIds = [$today => $today];
+        foreach ($filenames as $filename) {
+            $id = $this->filenameToChunkId(basename($filename));
+            if ($id) {
+                $chunkIds[$id] = $id;
+            }
+        }
+        return $chunkIds;
+    }
+
+    /**
      * @inheritdoc
      */
     public function fetch(string $id): SinkFile|null

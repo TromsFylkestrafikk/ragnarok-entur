@@ -2,7 +2,7 @@
 
 namespace Ragnarok\Entur\Tests;
 
-use Ragnarok\Entur\RagnarokEnturServiceProvider;
+use Ragnarok\Entur\EnturServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
@@ -32,6 +32,6 @@ class TestCase extends BaseTestCase
 
     protected function getPackageProviders($app)
     {
-        return [RagnarokEnturServiceProvider::class];
+        return [EnturServiceProvider::class];
     }
 }

@@ -5,16 +5,21 @@ namespace Ragnarok\Entur;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Ragnarok\Entur\Sinks\SinkEntur;
+use Ragnarok\Entur\Services\EnturAuthToken;
 use Ragnarok\Sink\Facades\SinkRegistrar;
 
-class RagnarokEnturServiceProvider extends ServiceProvider
+class EnturServiceProvider extends ServiceProvider
 {
+    public $singletons = [
+        EnturAuthToken::class => EnturAuthToken::class,
+    ];
+
     /**
      * Bootstrap any application services.
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/ragnarok_entur.php', 'ragnarok_entur');
         $this->publishConfig();
@@ -23,11 +28,25 @@ class RagnarokEnturServiceProvider extends ServiceProvider
     }
 
     /**
+     * Publish Config
+     *
+     * @return void
+     */
+    public function publishConfig(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/ragnarok_entur.php' => config_path('ragnarok_entur.php'),
+            ], ['config', 'config-entur', 'entur']);
+        }
+    }
+
+    /**
      * Register the package routes.
      *
      * @return void
      */
-    private function registerRoutes()
+    protected function registerRoutes(): void
     {
         Route::group($this->routeConfiguration(), function () {
             $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
@@ -39,36 +58,12 @@ class RagnarokEnturServiceProvider extends ServiceProvider
     *
     * @return array
     */
-    private function routeConfiguration()
+    protected function routeConfiguration(): array
     {
         return [
             'namespace'  => "Ragnarok\Entur\Http\Controllers",
             'middleware' => 'api',
             'prefix'     => 'api'
         ];
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
-    }
-
-    /**
-     * Publish Config
-     *
-     * @return void
-     */
-    public function publishConfig()
-    {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../config/ragnarok_entur.php' => config_path('ragnarok_entur.php'),
-            ], 'config');
-        }
     }
 }

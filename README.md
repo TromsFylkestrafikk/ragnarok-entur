@@ -4,18 +4,43 @@ Makes Entur data available, so far only NeTEx route data.
 
 ## Install
 
-1. Add repository to your composer.json:
-```json
-    "repositories": [
-        {
-            "type": "github",
-            "url": "https://github.com/example/ragnarok-entur"
-        },
-```
-2. Add it.
-```bash
-composer require ragnarok/ragnarok-entur
-```
+1. Add required repositories to your composer.json:
+   ```json
+       "repositories": [
+           {
+               "type": "path",
+               "url": "../christmas-tree-parser"
+           },
+           {
+               "type": "path",
+               "url": "../laravel-netex"
+           },
+           {
+               "type": "github",
+               "url": "https://github.com/example/ragnarok-entur"
+           },
+   ```
+2. Add the entur package:
+   ```bash
+   composer require ragnarok/ragnarok-entur
+   ```
+3. Add config from entur and netex packages:
+   ```bash
+   php artisan vendor:publish --tag=config-entur
+   php artisan vendor:publish --provider="TromsFylkestrafikk\Netex\NetexServiceProvider" --tag=config
+   ```
+4. Add necessary `.env` variables:
+   ```ini
+   ENTUR_AUTH_URL          = https://partner.staging.entur.org/oauth/token
+   ENTUR_CLIENT_ID         = ***
+   ENTUR_SECRET            = ***
+   ENTUR_AUDIENCE          = https://api.staging.entur.io
+   ENTUR_API_PATH          = timetable-admin/v1/timetable/download_netex_blocks/***
+   ENTUR_ENV               = staging
+
+   # Main XML file for parsing netex route data.
+   ENTUR_ROUTEDATA_XML_MAIN = ***shared_data.xml
+   ```
 
 ## License
 

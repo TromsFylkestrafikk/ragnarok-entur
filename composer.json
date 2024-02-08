@@ -1,5 +1,5 @@
 {
-    "name": "ragnarok/ragnarok-entur",
+    "name": "ragnarok/entur",
     "description": "Ragnarok entur datasink",
     "type": "library",
     "license": "GPL-3.0-or-later",
@@ -35,7 +35,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Ragnarok\\Entur\\Tests\\":"tests/"
+            "Ragnarok\\Entur\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -44,22 +44,22 @@
     },
     "repositories": [
         {
-            "type": "vcs",
+            "type": "github",
             "url": "https://github.com/TromsFylkestrafikk/christmas-tree-parser"
         },
         {
-            "type": "github",
-            "url": "https://github.com/tromsfylkestrafikk/ragnarok-sink"
+            "type": "path",
+            "url": "../ragnarok-sink"
         },
         {
-            "type": "github",
-            "url": "https://github.com/tromsfylkestrafikk/laravel-netex"
+            "type": "path",
+            "url": "../laravel-netex"
         }
     ],
     "extra": {
         "laravel": {
             "providers": [
-                "Ragnarok\\Entur\\RagnarokEnturServiceProvider"
+                "Ragnarok\\Entur\\EnturServiceProvider"
             ]
         }
     }

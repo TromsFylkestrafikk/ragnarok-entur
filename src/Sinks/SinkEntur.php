@@ -3,18 +3,31 @@
 namespace Ragnarok\Entur\Sinks;
 
 use Illuminate\Support\Carbon;
+use Ragnarok\Entur\Services\Entur;
 use Ragnarok\Sink\Models\SinkFile;
 use Ragnarok\Sink\Sinks\SinkBase;
-use Ragnarok\Sink\Services\ChunkArchive;
-use Ragnarok\Sink\Services\ChunkExtractor;
 
+/**
+ * Entur doesn't provide historic route sets or historic NSR data, so this sink
+ * only provides today's sink
+ */
 class SinkEntur extends SinkBase
 {
     public static $id = "entur";
     public static $title = "Entur";
 
+    /**
+     * @var Entur
+     */
+    protected $entur;
+
     // Run fetch+import daily at 05:00
     public $cron = '0 05 * * *';
+
+    public function __construct()
+    {
+        $this->entur = new Entur();
+    }
 
     /**
      * @inheritdoc
@@ -62,8 +75,8 @@ class SinkEntur extends SinkBase
      */
     public function getFromDate(): Carbon
     {
-        // First chunk of available data is from 2023.
-        return new Carbon('2023-01-01');
+        // Lets use already provided/stored data as initial date.
+        return Carbon::today();
     }
 
     /**
@@ -71,7 +84,7 @@ class SinkEntur extends SinkBase
      */
     public function getToDate(): Carbon
     {
-        return today()->subDay();
+        return Carbon::today();
     }
 
     /**
@@ -79,14 +92,7 @@ class SinkEntur extends SinkBase
      */
     public function fetch(string $id): SinkFile|null
     {
-        // Retrieve data, stuff it to a single file and hand it over.
-        //
-        // $archive = new ChunkArchive(static::$id, $id);
-        // foreach (EnturService::fetch($id) as $filepath) {
-        //     $archive->addFile($filePath, basename($filepath));
-        // }
-        // return $archive;
-        return null;
+        return $this->entur->downloadRouteset()->getFile();
     }
 
     /**
@@ -94,15 +100,7 @@ class SinkEntur extends SinkBase
      */
     public function import(string $chunkId, SinkFile $file): int
     {
-        // Using the created archive above, import it to DB.
-        //
-        // $extractor = new ChunkExtractor(static::$id, $file);
-        // $records = 0;
-        // foreach ($extractor->getFiles() as $filepath) {
-        //     $records += EnturService::import($filepath);
-        // }
-        // return $records;
-        return 0;
+        return $this->entur->importRouteset($file);
     }
 
     /**
@@ -110,10 +108,7 @@ class SinkEntur extends SinkBase
      */
     public function deleteImport(string $id, SinkFile $file): bool
     {
-        // $extractor = new ChunkExtractor(static::$id, $file);
-        // foreach ($extractor->getFiles() as $filepath) {
-        //     EnturService::delete(basename($filepath));
-        // }
+        $this->entur->delImport($file);
         return true;
     }
 
@@ -122,8 +117,6 @@ class SinkEntur extends SinkBase
      */
     public function filenameToChunkId(string $filename): string|null
     {
-        $matches = [];
-        $hits = preg_match('|^(?P<date>\d{4}-\d{2}-\d{2})\.zip$|', $filename, $matches);
-        return $hits ? $matches['date'] : null;
+        return $this->entur->getDateFromFilename($filename);
     }
 }

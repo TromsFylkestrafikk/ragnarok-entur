@@ -15,6 +15,7 @@ class SinkEntur extends SinkBase
 {
     public static $id = "entur";
     public static $title = "Entur";
+    public $singleState = true;
 
     /**
      * @var Entur

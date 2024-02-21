@@ -2,10 +2,11 @@
 
 namespace Ragnarok\Entur\Sinks;
 
-use Illuminate\Support\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Http;
+use Ragnarok\Sink\Services\ChunkArchive;
 use Ragnarok\Entur\Services\Entur;
 use Ragnarok\Sink\Models\SinkFile;
-use Ragnarok\Sink\Sinks\SinkBase;
 
 /**
  * Sink handler for National stop register (NSR) from Entur
@@ -48,28 +49,7 @@ class SinkEnturStops extends SinkEnturBase
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getFromDate(): Carbon
-    {
-        // Lets use already provided/stored data as initial date.
-        return Carbon::today();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getToDate(): Carbon
-    {
-        return Carbon::today();
-    }
-
-    /**
      * Get available chunk IDs.
-     *
-     * EnTur does not have an available route set history, so we need to build
-     * this ourselves. Only previously stored files are available as chunk IDs.
-     * And today's route set.
      *
      * @return array
      */
@@ -98,7 +78,18 @@ class SinkEnturStops extends SinkEnturBase
      */
     public function fetch(string $id): SinkFile|null
     {
-        return $this->entur->downloadRouteset()->getFile();
+        $today = today()->format('Y-m-d');
+        if ($id !== $today) {
+            throw new Exception('Entur only provides todays NSR set.');
+        }
+        $archive = new ChunkArchive(SinkEnturStops::$id, $id);
+        foreach (config('ragnarok_entur.import_stop_archives') as $number => $url) {
+            $urlParts = parse_url($url);
+            $filename = basename($urlParts['path']);
+            $response = Http::get($url);
+            $archive->addFromString($filename, $response->body());
+        }
+        return $archive->save()->getFile();
     }
 
     /**

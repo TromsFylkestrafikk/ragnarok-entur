@@ -3,9 +3,7 @@
 namespace Ragnarok\Entur\Sinks;
 
 use Exception;
-use Illuminate\Support\Facades\Http;
-use Ragnarok\Sink\Services\ChunkArchive;
-use Ragnarok\Entur\Services\Entur;
+use Ragnarok\Entur\Services\EnturStops;
 use Ragnarok\Sink\Models\SinkFile;
 
 /**
@@ -18,16 +16,16 @@ class SinkEnturStops extends SinkEnturBase
     public $singleState = true;
 
     /**
-     * @var Entur
+     * @var EnturStops
      */
-    protected $entur;
+    protected $enturStops;
 
     // Run fetch+import daily at 05:00
     public $cron = '30 04 * * *';
 
     public function __construct()
     {
-        $this->entur = new Entur();
+        $this->enturStops = new EnturStops();
     }
 
     /**
@@ -76,20 +74,13 @@ class SinkEnturStops extends SinkEnturBase
     /**
      * @inheritdoc
      */
-    public function fetch(string $id): SinkFile|null
+    public function fetch(string $chunkId): SinkFile|null
     {
         $today = today()->format('Y-m-d');
-        if ($id !== $today) {
+        if ($chunkId !== $today) {
             throw new Exception('Entur only provides todays NSR set.');
         }
-        $archive = new ChunkArchive(SinkEnturStops::$id, $id);
-        foreach (config('ragnarok_entur.import_stop_archives') as $number => $url) {
-            $urlParts = parse_url($url);
-            $filename = basename($urlParts['path']);
-            $response = Http::get($url);
-            $archive->addFromString($filename, $response->body());
-        }
-        return $archive->save()->getFile();
+        return $this->enturStops->downloadStops($chunkId);
     }
 
     /**
@@ -97,7 +88,7 @@ class SinkEnturStops extends SinkEnturBase
      */
     public function import(string $chunkId, SinkFile $file): int
     {
-        return $this->entur->importRouteset($file);
+        return $this->enturStops->importFromSink($file);
     }
 
     /**
@@ -105,7 +96,6 @@ class SinkEnturStops extends SinkEnturBase
      */
     public function deleteImport(string $id, SinkFile $file): bool
     {
-        $this->entur->delRouteImport($file);
         return true;
     }
 

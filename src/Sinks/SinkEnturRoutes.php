@@ -2,23 +2,22 @@
 
 namespace Ragnarok\Entur\Sinks;
 
-use Illuminate\Support\Carbon;
-use Ragnarok\Entur\Services\Entur;
+use Ragnarok\Entur\Services\EnturNetex;
 use Ragnarok\Sink\Models\SinkFile;
-use Ragnarok\Sink\Sinks\SinkBase;
 
 /**
+ * Sink handler for NeTEx route data from Entur
+ *
  * Entur doesn't provide historic route sets or historic NSR data, so this sink
  * only provides today's sink
  */
-class SinkEntur extends SinkBase
+class SinkEnturRoutes extends SinkEnturBase
 {
-    public static $id = "entur";
-    public static $title = "Entur";
-    public $singleState = true;
+    public static $id = "entur-routes";
+    public static $title = "Entur Routedata";
 
     /**
-     * @var Entur
+     * @var EnturNetex
      */
     protected $entur;
 
@@ -27,7 +26,7 @@ class SinkEntur extends SinkBase
 
     public function __construct()
     {
-        $this->entur = new Entur();
+        $this->entur = new EnturNetex();
     }
 
     /**
@@ -56,36 +55,10 @@ class SinkEntur extends SinkBase
             'netex_routes' => 'List of routes and lines owning them',
             'netex_service_links' => 'All segments/links available with coordinates and distance',
             'netex_stop_assignments' => 'Maps internal stop point ids to actual NSR quays',
-            'netex_stop_place' => 'NSR stop place',
-            'netex_stop_place_alt_id' => 'List of old, alternative IDs used for stops',
-            'netex_stop_place_group_member' => 'Maps (child) stop points to group of stop places',
-            'netex_stop_points' => 'NeTEx internal list of stop places',
-            'netex_stop_quay' => 'NSR stop place quay. Refers always to its stop place',
-            'netex_stop_quay_alt_id' => 'Old and alternative IDs used on stop quays',
-            'netex_stop_tariff_zone' => 'Maps stops to tariff zones',
-            'netex_tariff_zone' => 'List of tariff zones with polygon data',
-            'netex_topographic_place' => 'Topographic place names with polygon data',
             'netex_vehicle_blocks' => 'Vehicle block list',
             'netex_vehicle_journeys' => 'List of actual journeys to be executed',
             'netex_vehicle_schedules' => 'Maps list of journeys to vehicle blocks',
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getFromDate(): Carbon
-    {
-        // Lets use already provided/stored data as initial date.
-        return Carbon::today();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getToDate(): Carbon
-    {
-        return Carbon::today();
     }
 
     /**
@@ -138,7 +111,7 @@ class SinkEntur extends SinkBase
      */
     public function deleteImport(string $id, SinkFile $file): bool
     {
-        $this->entur->delImport($file);
+        $this->entur->delRouteImport($file);
         return true;
     }
 

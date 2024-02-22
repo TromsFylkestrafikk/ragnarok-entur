@@ -5,7 +5,7 @@ namespace Ragnarok\Entur\Services;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
 use Ragnarok\Entur\Facades\EnturApi;
-use Ragnarok\Entur\Sinks\SinkEntur;
+use Ragnarok\Entur\Sinks\SinkEnturRoutes;
 use Ragnarok\Sink\Models\SinkFile;
 use Ragnarok\Sink\Services\LocalFile;
 use Ragnarok\Sink\Services\ChunkExtractor;
@@ -16,7 +16,7 @@ use TromsFylkestrafikk\Netex\Models\Import;
 /**
  * Services surrounding EnTur API
  */
-class Entur
+class EnturNetex
 {
     use LogPrintf;
 
@@ -27,7 +27,7 @@ class Entur
 
     public function __construct()
     {
-        $this->logPrintfInit("[EnTur]: ");
+        $this->logPrintfInit("[EnTur NeTEx]: ");
     }
 
     /**
@@ -51,7 +51,7 @@ class Entur
     public function downloadRouteset(): LocalFile
     {
         $this->debug('Downloading route set ...');
-        $lFile = LocalFile::createFromFilename(SinkEntur::$id, $this->makeTargetFilename())->assertDir();
+        $lFile = LocalFile::createFromFilename(SinkEnturRoutes::$id, $this->makeTargetFilename())->assertDir();
         Http::withOptions(['sink' => $lFile->getPath()])
             ->withHeaders(['authorization' => 'Bearer ' . EnturApi::getApiToken()])
             ->get($this->getNetexRoutedataUrl());
@@ -63,7 +63,7 @@ class Entur
     {
         // Remove any existing entries in import table.
         Import::truncate();
-        $extractor = new ChunkExtractor(SinkEntur::$id, $file);
+        $extractor = new ChunkExtractor(SinkEnturRoutes::$id, $file);
         $extractor->setDestDir(basename($file->name, '.zip'))->extract();
         $this->debug('extracting route set to %s', $extractor->getDestDir());
         Artisan::call('netex:routedata-import', [
@@ -77,10 +77,10 @@ class Entur
     /**
      * Delete imported
      */
-    public function delImport(SinkFile $file): bool
+    public function delRouteImport(SinkFile $file): bool
     {
         // Rebuild extraction dir for comparison with netex import table
-        $extractor = new ChunkExtractor(SinkEntur::$id, $file);
+        $extractor = new ChunkExtractor(SinkEnturRoutes::$id, $file);
         $extractor->setDestDir(basename($file->name, '.zip'));
         $netexImport = Import::where('path', $extractor->getDestDir())->first();
         if (!$netexImport) {

@@ -38,9 +38,7 @@ class EnturStops
 
     public function __destruct()
     {
-        foreach ($this->dirty as $dir) {
-            $this->sinkDisk->deleteDirectory($dir);
-        }
+        $this->cleanup();
     }
 
     /**
@@ -65,12 +63,14 @@ class EnturStops
         foreach ($extractor->getFiles() as $index => $path) {
             $count += $this->importFromZip($path, $index === 0);
         }
+        $this->cleanup();
         return $count;
     }
 
     protected function importFromZip(string $path, $first = false): int
     {
         $extractDir = uniqid('stops-');
+        array_push($this->dirty, $extractDir);
         $this->sinkDisk->makeDirectory($extractDir);
         $archive = new ZipArchive();
         $archive->open($path);
@@ -86,5 +86,12 @@ class EnturStops
     protected function createTargetFilename(): string
     {
         return sprintf('stops_%s.zip', today()->format('Y-m-d'));
+    }
+
+    protected function cleanup()
+    {
+        while (($dir = array_pop($this->dirty))) {
+            $this->sinkDisk->deleteDirectory($dir);
+        }
     }
 }

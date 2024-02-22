@@ -33,9 +33,7 @@ abstract class SinkEnturBase extends SinkBase
     /**
      * Get available chunk IDs.
      *
-     * EnTur does not have an available route set history, so we need to build
-     * this ourselves. Only previously stored files are available as chunk IDs.
-     * And today's route set.
+     * Use existing entries in the SinkFile table as base.
      *
      * @return array
      */

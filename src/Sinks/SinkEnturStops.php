@@ -51,31 +51,6 @@ class SinkEnturStops extends SinkEnturBase
     }
 
     /**
-     * Get available chunk IDs.
-     *
-     * @return array
-     */
-    public function getChunkIds(): array
-    {
-        $filenames = SinkFile::select('name')
-            ->where('sink_id', self::$id)
-            ->orderBy('name')
-            ->get()
-            ->keyBy('name')
-            ->pluck('name')
-            ->toArray();
-        $today = today()->format('Y-m-d');
-        $chunkIds = [$today => $today];
-        foreach ($filenames as $filename) {
-            $id = $this->filenameToChunkId(basename($filename));
-            if ($id) {
-                $chunkIds[$id] = $id;
-            }
-        }
-        return $chunkIds;
-    }
-
-    /**
      * @inheritdoc
      */
     public function fetch(string $chunkId): SinkFile|null

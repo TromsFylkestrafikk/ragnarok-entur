@@ -64,8 +64,7 @@ class EnturNetex
         // Remove any existing entries in import table.
         Import::truncate();
         $extractor = new ChunkExtractor(SinkEnturRoutes::$id, $file);
-        $extractor->setDestDir(basename($file->name, '.zip'))->extract();
-        $this->debug('extracting route set to %s', $extractor->getDestDir());
+        $extractor->extract();
         Artisan::call('netex:routedata-import', [
             '--force' => true,
             'path' => $extractor->getDestDir(),

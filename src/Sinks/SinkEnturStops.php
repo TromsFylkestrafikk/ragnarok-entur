@@ -3,6 +3,7 @@
 namespace Ragnarok\Entur\Sinks;
 
 use Exception;
+use Illuminate\Support\Collection;
 use Ragnarok\Entur\Services\EnturStops;
 use Ragnarok\Sink\Models\SinkFile;
 
@@ -96,6 +97,18 @@ class SinkEnturStops extends SinkEnturBase
      */
     public function deleteImport(string $id, SinkFile $file): bool
     {
+        // laravel_netex package doesn't have prune/truncate-function. Do it
+        // manually.
+        collect([
+            'StopPlace',
+            'StopQuay',
+            'GroupOfStopPlaces',
+            'TariffZone',
+            'TopographicPlace',
+        ])->each(function ($modelName) {
+            $modelClass = 'TromsFylkestrafikk\\Netex\\Models\\' . $modelName;
+            $modelClass::truncate();
+        });
         return true;
     }
 
@@ -104,6 +117,8 @@ class SinkEnturStops extends SinkEnturBase
      */
     public function filenameToChunkId(string $filename): string|null
     {
-        return $this->entur->getDateFromFilename($filename);
+        $matches = [];
+        $hits = preg_match('|^(?P<date>\d{4}-\d{2}-\d{2})\.zip$|', $filename, $matches);
+        return $hits ? $matches['date'] : null;
     }
 }

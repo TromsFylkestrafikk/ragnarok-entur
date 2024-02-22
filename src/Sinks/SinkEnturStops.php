@@ -3,7 +3,6 @@
 namespace Ragnarok\Entur\Sinks;
 
 use Exception;
-use Illuminate\Support\Collection;
 use Ragnarok\Entur\Services\EnturStops;
 use Ragnarok\Sink\Models\SinkFile;
 
@@ -17,12 +16,16 @@ class SinkEnturStops extends SinkEnturBase
     public $singleState = true;
 
     /**
+     * Run import daily at 04:30
+     *
+     * @var string
+     */
+    public $cron = '30 04 * * *';
+
+    /**
      * @var EnturStops
      */
     protected $enturStops;
-
-    // Run fetch+import daily at 05:00
-    public $cron = '30 04 * * *';
 
     public function __construct()
     {

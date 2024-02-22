@@ -2,7 +2,7 @@
 
 namespace Ragnarok\Entur\Sinks;
 
-use Ragnarok\Entur\Services\Entur;
+use Ragnarok\Entur\Services\EnturNetex;
 use Ragnarok\Sink\Models\SinkFile;
 
 /**
@@ -16,12 +16,17 @@ class SinkEnturRoutes extends SinkEnturBase
     public static $id = "entur-routes";
     public static $title = "Entur Routedata";
 
+    /**
+     * @var EnturNetex
+     */
+    protected $entur;
+
     // Run fetch+import daily at 05:00
     public $cron = '0 05 * * *';
 
     public function __construct()
     {
-        $this->entur = new Entur();
+        $this->entur = new EnturNetex();
     }
 
     /**

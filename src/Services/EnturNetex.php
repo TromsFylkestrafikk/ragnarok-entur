@@ -16,7 +16,7 @@ use TromsFylkestrafikk\Netex\Models\Import;
 /**
  * Services surrounding EnTur API
  */
-class Entur
+class EnturNetex
 {
     use LogPrintf;
 
@@ -27,7 +27,7 @@ class Entur
 
     public function __construct()
     {
-        $this->logPrintfInit("[EnTur]: ");
+        $this->logPrintfInit("[EnTur NeTEx]: ");
     }
 
     /**

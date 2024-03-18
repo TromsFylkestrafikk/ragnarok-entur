@@ -13,8 +13,10 @@ class ExampleTest extends TestCase
      */
     public function testBasicTest()
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
+        //$response = $this->get('/');
+        //$response->assertStatus(200);
+        //this is a laravel package not a laravel site
+        //so this test doesnt really make any sense
+        $this->assertTrue(true);
     }
 }

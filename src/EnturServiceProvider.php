@@ -25,6 +25,8 @@ class EnturServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/ragnarok_entur.php', 'ragnarok_entur');
         $this->publishConfig();
 
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
         SinkRegistrar::register(SinkEnturRoutes::class);
         SinkRegistrar::register(SinkEnturStops::class);
     }

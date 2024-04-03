@@ -5,6 +5,7 @@ namespace Ragnarok\Entur;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Ragnarok\Entur\Sinks\SinkEnturRoutes;
+use Ragnarok\Entur\Sinks\SinkEnturSales;
 use Ragnarok\Entur\Sinks\SinkEnturStops;
 use Ragnarok\Entur\Services\EnturAuthToken;
 use Ragnarok\Sink\Facades\SinkRegistrar;
@@ -29,6 +30,7 @@ class EnturServiceProvider extends ServiceProvider
 
         SinkRegistrar::register(SinkEnturRoutes::class);
         SinkRegistrar::register(SinkEnturStops::class);
+        SinkRegistrar::register(SinkEnturSales::class);
     }
 
     /**

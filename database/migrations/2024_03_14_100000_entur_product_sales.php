@@ -13,32 +13,34 @@ return new class extends Migration
     {
         Schema::create('entur_product_sales', function (Blueprint $table) 
         {
-            $table->id();
+            //$table->id('id');
             $table->uuid('sales_orderline_id');
             $table->uuid('sales_fare_product_id');
             $table->string('distribution_channel_ref');
-            $table->string('sales_order_id');
-            $table->integer('sales_order_version');
-            $table->string('sales_payment_type');
-            $table->date('sales_date');
+            $table->string('sales_order_id')->nullable();
+            $table->integer('sales_order_version')->nullable();
+            $table->string('sales_payment_type')->nullable();
+            $table->date('sales_date')->nullable();
             
-            $table->string('sales_package_ref');
-            $table->string('sales_package_name');
+            $table->string('sales_package_ref')->nullable();
+            $table->string('sales_package_name')->nullable();
             
-            $table->string('sales_user_profile_ref');
-            $table->string('sales_user_profile_name');
+            $table->string('sales_user_profile_ref')->nullable();
+            $table->string('sales_user_profile_name')->nullable();
 
-            $table->dateTime('sales_start_time');
+            $table->dateTime('sales_start_time')->nullable();
             
-            $table->string('sales_from_stop_place');
-            $table->string('sales_from_stop_name');
-            $table->string('sales_top_stop_place');
-            $table->string('sales_top_stop_place_name');
+            $table->string('sales_from_stop_place')->nullable();
+            $table->string('sales_from_stop_name')->nullable();
+            $table->string('sales_top_stop_place')->nullable();
+            $table->string('sales_top_stop_place_name')->nullable();
 
-            $table->integer('sales_zone_count');
-            $table->string('sales_zones_ref');
+            $table->integer('sales_zone_count')->nullable();
+            $table->string('sales_zones_ref')->nullable();
 
-            $table->float('annex_amount');
+            $table->float('annex_amount')->nullable();
+
+            $table->primary(['sales_orderline_id', 'sales_fare_product_id']);
         });
     }
 

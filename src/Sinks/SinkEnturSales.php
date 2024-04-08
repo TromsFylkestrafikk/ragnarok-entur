@@ -44,8 +44,6 @@ class SinkEnturSales extends SinkEnturBase
 
     public function destinationTables(): array
     {
-        return [
-            'entur_product_sales'
-        ];
+        return $this->service->destinationTables();
     }
 }

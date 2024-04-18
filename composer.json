@@ -17,8 +17,8 @@
         "illuminate/console": "^10.0",
         "illuminate/database": "^10.0",
         "illuminate/support": "^10.0",
-        "ragnarok/sink": "dev-main",
-        "tromsfylkestrafikk/laravel-netex": "dev-master"
+        "ragnarok/sink": "^0.1.0",
+        "tromsfylkestrafikk/laravel-netex": "0.2.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.6",
@@ -44,16 +44,16 @@
     },
     "repositories": [
         {
-            "type": "github",
-            "url": "https://github.com/TromsFylkestrafikk/christmas-tree-parser"
+            "type": "vcs",
+            "url": "https://github.com/tromsfylkestrafikk/christmas-tree-parser"
         },
         {
-            "type": "path",
-            "url": "../ragnarok-sink"
+            "type": "vcs",
+            "url": "https://github.com/tromsfylkestrafikk/laravel-netex"
         },
         {
-            "type": "path",
-            "url": "../laravel-netex"
+            "type": "vcs",
+            "url": "https://github.com/tromsfylkestrafikk/ragnarok-sink"
         }
     ],
     "extra": {

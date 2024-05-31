@@ -156,6 +156,18 @@ class EnturSales {
         $mapper->column('ANNEX_TAX_CODE', 'annex_tax_code');
         $mapper->column('ANNEX_TAX_RATE', 'annex_tax_rate');
 
+        $mapper->column('LINE_ID','line_id');
+        $mapper->column('LINE_ACCOUNTING_DATE', 'line_accounting_date')->format([static::class, 'dateFormatter']);;
+        $mapper->column('LINE_CATEGORY_REF', 'line_category_ref');
+        $mapper->column('LINE_CATEGORY_DESCRIPTION', 'line_category_description');
+        $mapper->column('LINE_AMOUNT', 'line_amount');
+        $mapper->column('LINE_CANCELLATION', 'line_cancellation');
+        $mapper->column('LINE_STANDARD_TAX_CODE', 'line_standard_tax_code');
+        $mapper->column('LINE_LOCAL_TAX_CODE', 'line_local_tax_code');
+        $mapper->column('LINE_LOCAL_TAX_RATE', 'line_local_tax_rate');
+        $mapper->column('LINE_TAX_AMOUNT', 'line_tax_amount');
+
+
 
         return $mapper->
             exec()->

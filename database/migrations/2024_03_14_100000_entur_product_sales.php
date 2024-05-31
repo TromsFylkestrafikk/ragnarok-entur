@@ -68,16 +68,16 @@ return new class extends Migration
             $table->integer('annex_tax_code')->nullable();
             $table->integer('annex_tax_rate')->nullable();
 
-            $table->biginteger('line_id')->nullable();
-            $table->date('line_accounting_date')->nullable();
-            $table->string('line_category_ref')->nullable();
-            $table->string('line_category_description')->nullable();
-            $table->integer('line_amount')->nullable();
-            $table->integer('line_cancellation')->nullable();
-            $table->integer('line_standard_tax_code')->nullable();
-            $table->integer('line_local_tax_code')->nullable();
-            $table->integer('line_local_tax_rate')->nullable();
-            $table->float('line_tax_amount')->nullable();
+            $table->biginteger('line_id');
+            $table->date('line_accounting_date');
+            $table->string('line_category_ref');
+            $table->string('line_category_description');
+            $table->integer('line_amount');
+            $table->integer('line_cancellation');
+            $table->integer('line_standard_tax_code');
+            $table->integer('line_local_tax_code');
+            $table->integer('line_local_tax_rate');
+            $table->float('line_tax_amount');
 
 
             

@@ -1,0 +1,74 @@
+{
+    "date": [
+      "Tue, 28 May 2024 08:30:08 GMT"
+    ],
+    "content-type": [
+      "application/csv"
+    ],
+    "cache-control": [
+      "no-cache, no-store, max-age=0, must-revalidate"
+    ],
+    "content-disposition": [
+      "attachment; filename=S-1_CSV2Troms_Fylkeskommune_Samferdsel_2024-03-07_2024030771419_v24.csv"
+    ],
+    "expires": [
+      "0"
+    ],
+    "pragma": [
+      "no-cache"
+    ],
+    "strict-transport-security": [
+      "max-age=31536000 ; includeSubDomains"
+    ],
+    "vary": [
+      "Origin,Access-Control-Request-Method,Access-Control-Request-Headers"
+    ],
+    "x-content-type-options": [
+      "nosniff"
+    ],
+    "x-correlation-id": [
+      "046475f1-fd3d-4a02-bc43-fe45ba57b095"
+    ],
+    "x-entur-report-id": [
+      "545329"
+    ],
+    "x-frame-options": [
+      "DENY"
+    ],
+    "x-xss-protection": [
+      "0"
+    ],
+    "x-robots-tag": [
+      "none"
+    ],
+    "access-control-allow-origin": [
+      "*"
+    ],
+    "access-control-allow-headers": [
+      "origin, x-requested-with, accept, authorization, content-type, content-disposition, x-correlation-id"
+    ],
+    "access-control-expose-headers": [
+      "content-disposition"
+    ],
+    "access-control-max-age": [
+      "3628800"
+    ],
+    "access-control-allow-methods": [
+      "GET, PUT, POST, DELETE"
+    ],
+    "x-request-id": [
+      "891b70ce-36a4-4173-aebf-108faa0026f8"
+    ],
+    "x-accel-buffering": [
+      "no"
+    ],
+    "via": [
+      "1.1 google"
+    ],
+    "Alt-Svc": [
+      "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+    ],
+    "Transfer-Encoding": [
+      "chunked"
+    ]
+  }

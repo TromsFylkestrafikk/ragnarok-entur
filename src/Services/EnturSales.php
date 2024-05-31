@@ -97,6 +97,11 @@ class EnturSales {
             $csv->setDelimiter(';');
         });
 
+        // use ($chunkId) - to make $chunkId available inside the preInsertRecord callback function
+        $mapper->preInsertRecord(function ($csvRec, &$dbRec) use ($chunkId) {
+            $dbRec['chunk_id'] = $chunkId;
+        });
+
         $mapper->column('GROUP_ID', 'group_id');
         $mapper->column('SALES_ORDERLINE_ID', 'sales_orderline_id');
         $mapper->column('SALES_FARE_PRODUCT_ID','sales_fare_product_id');
@@ -134,11 +139,23 @@ class EnturSales {
         $mapper->column('SALES_FROM_STOP_PLACE_NAME', 'sales_from_stop_place_name'); //might be null
         $mapper->column('SALES_TO_STOP_PLACE', 'sales_to_stop_place'); //might be null
         $mapper->column('SALES_TO_STOP_PLACE_NAME', 'sales_to_stop_place_name'); // might be null
+        $mapper->column('SALES_ZONE_COUNT', 'sales_zone_count'); // might be null
+        $mapper->column('SALES_ZONES_REF', 'sales_zones_ref'); //might be null
 
-        // use ($chunkId) - to make $chunkId available inside the preInsertRecord callback function
-        $mapper->preInsertRecord(function ($csvRec, &$dbRec) use ($chunkId) {
-            $dbRec['chunk_id'] = $chunkId;
-        });
+        $mapper->column('SALES_INTERVAL_DISTANCE', 'sales_interval_distance'); //->nullable();  //Unsure what this is all about!
+        $mapper->column('SALES_LEG_SERVICEJOURNEY_REF', 'sales_leg_servicejourney_ref'); //might be null
+        $mapper->column('SALES_LEG_SERVICEJOURNEY_PCODE', 'sales_leg_servicejourney_pcode'); //might be null
+        $mapper->column('SALES_LEG_LINE_PUBLICCODE', 'sales_leg_line_publiccode'); //->nullable(); //Unsure, since all values are null
+        $mapper->column('SALES_LEG_LINE_REF', 'sales_leg_line_ref'); //might be null
+        $mapper->column('SALES_LEG_LINE_NAME', 'sales_leg_line_name'); // missing in data
+
+        $mapper->column('ANNEX_TRANSIENT_GUID', 'annex_transient_guid');
+        $mapper->column('ANNEX_DESCRIPTION', 'annex_description'); //->nullable(); //missing data
+        $mapper->column('ANNEX_OCCURS', 'annex_occurs'); //->nullable(); //missing data
+        $mapper->column('ANNEX_AMOUNT', 'annex_amount');
+        $mapper->column('ANNEX_TAX_CODE', 'annex_tax_code');
+        $mapper->column('ANNEX_TAX_RATE', 'annex_tax_rate');
+
 
         return $mapper->
             exec()->

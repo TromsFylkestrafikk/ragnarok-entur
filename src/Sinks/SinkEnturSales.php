@@ -42,6 +42,7 @@ class SinkEnturSales extends SinkEnturBase
     {
         $tables = $this->destinationTables();
         
+        
         foreach($tables as $table) {
             DB::table($table)->where('chunk_id', $id)->delete();
         }

@@ -2,6 +2,7 @@
 
 namespace Ragnarok\Entur\Services;
 
+use Illuminate\Support\Facades\Http;
 use League\Csv\Reader;
 use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Sink\Services\SinkDisk;
@@ -46,6 +47,7 @@ class EnturSales {
         $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
             ->get($this->getCleosS1Url($chunkId));
 
+   
         $this->debug("status: %d", $response->status());
         $status = $response->status();
         if($status == 200) {

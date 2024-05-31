@@ -3,6 +3,8 @@
 namespace Ragnarok\Entur\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Carbon;
+
 use League\Csv\Reader;
 use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Sink\Services\SinkDisk;
@@ -35,6 +37,16 @@ class EnturSales {
         $urlToUse = sprintf("%s/%s/%s", EnturCleosApi::getApiUrl(), config('ragnarok_entur.cleos.api_path'), "partner-reports/report/next/content?templateId=1015&idAfter={$this->xEnturReportId}&firstOrderedDate={$chunkId}");
         $this->debug("URL TO USE: %s", $urlToUse);
         return $urlToUse;
+    }
+
+    public static function dateFormatter($date)
+    {
+        return (new Carbon($date))->format('Y-m-d');
+    }
+
+    public static function dateTimeFormatter($date)
+    {
+        return (new Carbon($date))->format('Y-m-d H:i:s');
     }
 
     public function download($chunkId)
@@ -102,7 +114,26 @@ class EnturSales {
         $mapper->column('POS_LOCATION_REF', 'pos_location_ref'); //nullable
         $mapper->column('POS_LOCATION_NAME', 'pos_location_name'); //nullable
         $mapper->column('POS_PRIVATECODE', 'pos_privatecode'); //nullable
+        
         $mapper->column('TRANSACTION_TYPE', 'transaction_type');
+
+        $mapper->column('SALES_ORDER_ID', 'sales_order_id');
+        $mapper->column('SALES_ORDER_VERSION', 'sales_order_version');
+        $mapper->column('SALES_PAYMENT_TYPE', 'sales_payment_type');
+        $mapper->column('SALES_EXTERNAL_REFERENCE', 'sales_external_reference'); //nullable
+        $mapper->column('SALES_DATE', 'sales_date')->format([static::class, 'dateFormatter']);
+        $mapper->column('SALES_PRIVATECODE', 'sales_privatecode'); //nullable
+        $mapper->column('SALES_PACKAGE_REF', 'sales_package_ref'); 
+        $mapper->column('SALES_PACKAGE_NAME', 'sales_package_name');
+        $mapper->column('SALES_DISCOUNT_RIGHT_REF', 'sales_discount_right_ref'); //nullable //UNSURE of type since always empty in csv
+        $mapper->column('SALES_DISCOUNT_RIGHT_NAME', 'sales_discount_right_name'); //nullable //UNSURE of type since always empty in csv
+        $mapper->column('SALES_USER_PROFILE_REF', 'sales_user_profile_ref');
+        $mapper->column('SALES_USER_PROFILE_NAME', 'sales_user_profile_name');
+        $mapper->column('SALES_START_TIME', 'sales_start_time')->format([static::class, 'dateTimeFormatter']);
+        $mapper->column('SALES_FROM_STOP_PLACE', 'sales_from_stop_place'); //might be null
+        $mapper->column('SALES_FROM_STOP_PLACE_NAME', 'sales_from_stop_place_name'); //might be null
+        $mapper->column('SALES_TO_STOP_PLACE', 'sales_to_stop_place'); //might be null
+        $mapper->column('SALES_TO_STOP_PLACE_NAME', 'sales_to_stop_place_name'); // might be null
 
         // use ($chunkId) - to make $chunkId available inside the preInsertRecord callback function
         $mapper->preInsertRecord(function ($csvRec, &$dbRec) use ($chunkId) {

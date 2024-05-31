@@ -33,25 +33,25 @@ return new class extends Migration
             $table->string('pos_privatecode')->nullable(); //check
             $table->string('transaction_type'); //check
 
-            $table->uuid('sales_orderline_id');
-            $table->uuid('sales_fare_product_id');
-            $table->string('sales_order_id')->nullable();
-            $table->integer('sales_order_version')->nullable();
-            $table->string('sales_payment_type')->nullable();
-            $table->string('sales_external_reference')->nullable();
-            $table->date('sales_date')->nullable();
-            $table->string('sales_privatecode')->nullable();  //UNSURE of type since always empty in csv
-            $table->string('sales_package_ref')->nullable();
-            $table->string('sales_package_name')->nullable();
-            $table->string('sales_discount_right_ref')->nullable(); //UNSURE of type since always empty in csv
-            $table->string('sales_discount_right_name')->nullable(); //UNSURE of type since always empty in csv
-            $table->string('sales_user_profile_ref')->nullable();
-            $table->string('sales_user_profile_name')->nullable();
-            $table->dateTime('sales_start_time')->nullable();           
-            $table->string('sales_from_stop_place')->nullable();
-            $table->string('sales_from_stop_name')->nullable();
-            $table->string('sales_top_stop_place')->nullable();
-            $table->string('sales_top_stop_place_name')->nullable();
+            $table->uuid('sales_orderline_id'); //check
+            $table->uuid('sales_fare_product_id'); //check
+            $table->string('sales_order_id'); //check
+            $table->integer('sales_order_version'); //check
+            $table->string('sales_payment_type'); //check
+            $table->string('sales_external_reference')->nullable(); //check
+            $table->date('sales_date'); //check
+            $table->string('sales_privatecode')->nullable();  //check //UNSURE of type since always empty in csv
+            $table->string('sales_package_ref'); //check
+            $table->string('sales_package_name'); //Check
+            $table->string('sales_discount_right_ref')->nullable(); //check //UNSURE of type since always empty in csv
+            $table->string('sales_discount_right_name')->nullable(); //check  //UNSURE of type since always empty in csv
+            $table->string('sales_user_profile_ref');
+            $table->string('sales_user_profile_name');
+            $table->dateTime('sales_start_time');
+            $table->string('sales_from_stop_place')->nullable(); //might be null
+            $table->string('sales_from_stop_place_name')->nullable(); //might be null
+            $table->string('sales_to_stop_place')->nullable(); //might be null
+            $table->string('sales_to_stop_place_name')->nullable(); // might be null
             $table->integer('sales_zone_count')->nullable();
             $table->string('sales_zones_ref')->nullable();
             $table->string('sales_interval_distance')->nullable();  //Unsure what this is all about!

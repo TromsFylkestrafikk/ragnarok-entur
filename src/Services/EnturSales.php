@@ -6,14 +6,11 @@ use League\Csv\Reader;
 use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Sink\Services\SinkDisk;
 use Ragnarok\Entur\Facades\EnturCleosApi;
-use Ragnarok\Sink\Models\SinkFile;
-use Ragnarok\Sink\Services\LocalFile;
 use Ragnarok\Entur\Sinks\SinkEnturSales;
 use Ragnarok\Sink\Services\ChunkArchive;
 use Ragnarok\Sink\Services\ChunkExtractor;
 use Ragnarok\Sink\Services\CsvToTable;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
+use Ragnarok\Sink\Models\SinkFile;
 
 class EnturSales {
     use LogPrintf;
@@ -80,8 +77,7 @@ class EnturSales {
         ];
     }
 
-    protected function importFromCsv(string $path, string $chunkId)
-    {
+    protected function importFromCsv(string $path, string $chunkId) {
         $mapper = new CsvToTable($path, $this->destinationTables()[0], ['SALES_ORDERLINE_ID', 'SALES_FARE_PRODUCT_ID']);
         $mapper->prepareCsvReader(function (Reader $csv) {
             $csv->setDelimiter(';');

@@ -19,9 +19,7 @@ class SinkEnturSales extends SinkEnturBase
 
     public function __construct()
     {
-        //if($this->service == null) {
-            $this->service = new EnturSales();
-        //}
+        $this->service = new EnturSales();
     }
 
     public function import(string $chunkId, SinkFile $file): int
@@ -34,7 +32,7 @@ class SinkEnturSales extends SinkEnturBase
      */
     public function fetch(string $id): SinkFile|null
     {
-        return $this->service->download($id); //->getFile();
+        return $this->service->download($id);
     }
 
     /**

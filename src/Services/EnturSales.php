@@ -90,6 +90,20 @@ class EnturSales {
         $mapper->column('SALES_FARE_PRODUCT_ID','sales_fare_product_id');
         $mapper->column('DISTRIBUTION_CHANNEL_REF', 'distribution_channel_ref');
 
+        $mapper->column('ACCOUNTING_MONTH', 'accounting_month');
+        $mapper->column('ORGANISATION', 'organisation');
+        $mapper->column('AGREEMENT_REF', 'agreement_ref');
+        $mapper->column('AGREEMENT_DESCRIPTION', 'agreement_description');
+
+        $mapper->column('POS_PROVIDER_REF', 'pos_provider_ref');
+        $mapper->column('POS_SUPPLIER_REF', 'pos_supplier_ref');
+        $mapper->column('POS_REF', 'pos_ref');
+        $mapper->column('POS_NAME', 'pos_name'); //nullable
+        $mapper->column('POS_LOCATION_REF', 'pos_location_ref'); //nullable
+        $mapper->column('POS_LOCATION_NAME', 'pos_location_name'); //nullable
+        $mapper->column('POS_PRIVATECODE', 'pos_privatecode'); //nullable
+        $mapper->column('TRANSACTION_TYPE', 'transaction_type');
+
         // use ($chunkId) - to make $chunkId available inside the preInsertRecord callback function
         $mapper->preInsertRecord(function ($csvRec, &$dbRec) use ($chunkId) {
             $dbRec['chunk_id'] = $chunkId;

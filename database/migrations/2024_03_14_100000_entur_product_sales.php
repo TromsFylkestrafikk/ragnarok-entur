@@ -14,24 +14,24 @@ return new class extends Migration
         Schema::create('entur_product_sales', function (Blueprint $table) 
         {
             //$table->id('id');
-            $table->bigInteger('group_id');
-            $table->string('chunk_id');
+            $table->bigInteger('group_id'); //check
+            $table->string('chunk_id'); //check
 
-            // ACCOUNTING_MONTH
-            // ORGANISATION
-            // AGREEMENT_REF
-            // AGREEMENT_DESCRIPTION
+            $table->string('accounting_month'); //check
+            $table->string('organisation'); //check
+            $table->string('agreement_ref'); //check
+            $table->string('agreement_description'); //check
 
-            $table->string('distribution_channel_ref');
+            $table->string('distribution_channel_ref'); //check
 
-            // POS_PROVIDER_REF
-            // POS_SUPPLIER_REF
-            // POS_REF
-            // POS_NAME
-            // POS_LOCATION_REF
-            // POS_LOCATION_NAME
-            // POS_PRIVATECODE
-            // TRANSACTION_TYPE
+            $table->integer('pos_provider_ref'); //check
+            $table->integer('pos_supplier_ref'); //check
+            $table->string('pos_ref'); //check
+            $table->string('pos_name')->nullable(); //check
+            $table->string('pos_location_ref')->nullable(); //check
+            $table->string('pos_location_name')->nullable(); //check
+            $table->string('pos_privatecode')->nullable(); //check
+            $table->string('transaction_type'); //check
 
             $table->uuid('sales_orderline_id');
             $table->uuid('sales_fare_product_id');

@@ -35,6 +35,7 @@ class EnturSales {
     public function getCleosS1Url($chunkId): string
     {
         $urlToUse = sprintf("%s/%s/%s", EnturCleosApi::getApiUrl(), config('ragnarok_entur.cleos.api_path'), "partner-reports/report/next/content?templateId=1015&idAfter={$this->xEnturReportId}&firstOrderedDate={$chunkId}");
+        //$urlToUse = sprintf("%s/%s/%s", EnturCleosApi::getApiUrl(), config('ragnarok_entur.cleos.api_path'), "partner-reports/report/next/content?templateId=1015&idAfter={$this->xEnturReportId}&firstOrderedDate=2024-05-31");
         $this->debug("URL TO USE: %s", $urlToUse);
         return $urlToUse;
     }
@@ -49,12 +50,12 @@ class EnturSales {
         return (new Carbon($date))->format('Y-m-d H:i:s');
     }
 
-    public function download($chunkId)
+    public function download($chunkId): SinkFile|null
     {
         $token = $this->cleosApi->getApiToken();
         $this->debug("TOKEN IS: %s", $token);
         
-        $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
+        
 
         $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
             ->get($this->getCleosS1Url($chunkId));
@@ -63,13 +64,14 @@ class EnturSales {
         $this->debug("status: %d", $response->status());
         $status = $response->status();
         if($status == 200) {
+            $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
             $archive->addFromString("CLEOS-S1-{$chunkId}.csv", $response->body());
             $nextReport = intval($response->header("x-entur-report-id"));
             $this->xEnturReportId = $nextReport;
+            $archive->save();
+            return $archive->getFile();
         }
-
-        $archive->save();
-        return $archive->getFile();
+        return null;
     }
 
     public function import(string $chunkId, SinkFile $file)
@@ -180,61 +182,3 @@ class EnturSales {
         return sprintf('cleos_%s_%s.zip', config('ragnarok_entur.cleos.env'), today()->format('Y-m-d'));
     }
 }
-
-// GROUP_ID
-// ACCOUNTING_MONTH
-// ORGANISATION
-// AGREEMENT_REF
-// AGREEMENT_DESCRIPTION
-// DISTRIBUTION_CHANNEL_REF
-// POS_PROVIDER_REF
-// POS_SUPPLIER_REF
-// POS_REF
-// POS_NAME
-// POS_LOCATION_REF
-// POS_LOCATION_NAME
-// POS_PRIVATECODE
-// TRANSACTION_TYPE
-// SALES_ORDER_ID
-// SALES_ORDER_VERSION
-// SALES_PAYMENT_TYPE
-// SALES_EXTERNAL_REFERENCE
-// SALES_ORDERLINE_ID
-// SALES_FARE_PRODUCT_ID
-// SALES_PRIVATECODE
-// SALES_DATE
-// SALES_PACKAGE_REF
-// SALES_PACKAGE_NAME
-// SALES_DISCOUNT_RIGHT_REF
-// SALES_DISCOUNT_RIGHT_NAME
-// SALES_USER_PROFILE_REF
-// SALES_USER_PROFILE_NAME
-// SALES_START_TIME
-// SALES_FROM_STOP_PLACE
-// SALES_FROM_STOP_PLACE_NAME
-// SALES_TO_STOP_PLACE
-// SALES_TO_STOP_PLACE_NAME
-// SALES_ZONE_COUNT
-// SALES_ZONES_REF
-// SALES_INTERVAL_DISTANCE
-// SALES_LEG_SERVICEJOURNEY_REF
-// SALES_LEG_SERVICEJOURNEY_PCODE
-// SALES_LEG_LINE_PUBLICCODE
-// SALES_LEG_LINE_REF
-// SALES_LEG_LINE_NAME
-// ANNEX_TRANSIENT_GUID
-// ANNEX_DESCRIPTION
-// ANNEX_OCCURS
-// ANNEX_AMOUNT
-// ANNEX_TAX_CODE
-// ANNEX_TAX_RATE
-// LINE_ID
-// LINE_ACCOUNTING_DATE
-// LINE_CATEGORY_REF
-// LINE_CATEGORY_DESCRIPTION
-// LINE_AMOUNT
-// LINE_CANCELLATION
-// LINE_STANDARD_TAX_CODE
-// LINE_LOCAL_TAX_CODE
-// LINE_LOCAL_TAX_RATE
-// LINE_TAX_AMOUNT

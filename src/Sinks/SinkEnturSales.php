@@ -3,7 +3,6 @@
 namespace Ragnarok\Entur\Sinks;
 
 use Illuminate\Support\Facades\DB;
-
 use Ragnarok\Entur\Services\EnturSales;
 use Ragnarok\Sink\Models\SinkFile;
 
@@ -12,8 +11,6 @@ class SinkEnturSales extends SinkEnturBase
     public static $id = "entur-sales";
     public static $title = "Entur Salesdata";
     public $cron = '30 04 * * *';
-    //public $cron = '0 21 12 * ?';
-    
 
     protected $service;
 
@@ -41,12 +38,11 @@ class SinkEnturSales extends SinkEnturBase
     public function deleteImport(string $id, SinkFile $file): bool
     {
         $tables = $this->destinationTables();
-        
-        
-        foreach($tables as $table) {
+
+        foreach ($tables as $table) {
             DB::table($table)->where('chunk_id', $id)->delete();
         }
-        
+
         return true;
     }
 

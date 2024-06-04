@@ -38,7 +38,6 @@ Makes Entur data available, so far only NeTEx route data.
    ENTUR_API_PATH          = timetable-admin/v1/timetable/download_netex_blocks/***
    ENTUR_ENV               = staging
 
-   CLEOS_ENV               = staging
    CLEOS_AUTH_URL          = https://partner.staging.entur.org/oauth/token
    CLEOS_CLIENT_ID         = ***
    CLEOS_SECRET            = ***

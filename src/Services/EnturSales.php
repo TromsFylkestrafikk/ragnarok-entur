@@ -4,7 +4,6 @@ namespace Ragnarok\Entur\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Carbon;
-
 use League\Csv\Reader;
 use Ragnarok\Sink\Traits\LogPrintf;
 use Ragnarok\Sink\Services\SinkDisk;
@@ -15,7 +14,8 @@ use Ragnarok\Sink\Services\ChunkExtractor;
 use Ragnarok\Sink\Services\CsvToTable;
 use Ragnarok\Sink\Models\SinkFile;
 
-class EnturSales {
+class EnturSales
+{
     use LogPrintf;
 
 
@@ -24,7 +24,7 @@ class EnturSales {
     protected $xEnturReportId;
 
 
-    public function __construct() 
+    public function __construct()
     {
         $disk = new SinkDisk(SinkEnturSales::$id);
         $this->xEnturReportId = 0;
@@ -35,8 +35,13 @@ class EnturSales {
 
     public function getCleosS1Url($chunkId): string
     {
-        $urlToUse = sprintf("%s/%s/%s", EnturCleosApi::getApiUrl(), config('ragnarok_entur.cleos.api_path'), "partner-reports/report/next/content?templateId=1015&idAfter={$this->xEnturReportId}&firstOrderedDate={$chunkId}");
-        //$urlToUse = sprintf("%s/%s/%s", EnturCleosApi::getApiUrl(), config('ragnarok_entur.cleos.api_path'), "partner-reports/report/next/content?templateId=1015&idAfter={$this->xEnturReportId}&firstOrderedDate=2024-05-31");
+        $urlToUse = sprintf(
+            "%s/%s/%s",
+            EnturCleosApi::getApiUrl(),
+            config('ragnarok_entur.cleos.api_path'),
+            "partner-reports/report/next/content?templateId=1015&idAfter={$this->xEnturReportId}&firstOrderedDate={$chunkId}"
+        );
+
         $this->debug("URL TO USE: %s", $urlToUse);
         return $urlToUse;
     }
@@ -53,23 +58,21 @@ class EnturSales {
 
     public function download($chunkId): SinkFile|null
     {
-        $token = $this->cleosApi->getApiToken(); 
+        $token = $this->cleosApi->getApiToken();
 
         $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
             ->get($this->getCleosS1Url($chunkId));
 
-   
         $this->debug("status: %d", $response->status());
         $status = $response->status();
-        if($status == 200) {
+        if ($status == 200) {
             $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
             $archive->addFromString("CLEOS-S1-{$chunkId}.csv", $response->body());
             $nextReport = intval($response->header("x-entur-report-id"));
             $this->xEnturReportId = $nextReport;
             $archive->save();
             return $archive->getFile();
-        } else if($status == 202) 
-        {
+        } elseif ($status == 202) {
             $this->debug("Error: No Data on remote server for chunkId: %s", $chunkId);
         }
         return null;
@@ -83,7 +86,6 @@ class EnturSales {
             $this->debug("importing file: %s", $path);
             $count += $this->importFromCsv($path, $chunkId);
         }
-        $this->cleanup();
         return $count;
     }
 
@@ -94,7 +96,7 @@ class EnturSales {
         ];
     }
 
-    protected function importFromCsv(string $path, string $chunkId) 
+    protected function importFromCsv(string $path, string $chunkId)
     {
         $mapper = new CsvToTable($path, $this->destinationTables()[0], ['SALES_ORDERLINE_ID', 'SALES_FARE_PRODUCT_ID']);
         $mapper->prepareCsvReader(function (Reader $csv) {
@@ -108,7 +110,7 @@ class EnturSales {
 
         $mapper->column('GROUP_ID', 'group_id');
         $mapper->column('SALES_ORDERLINE_ID', 'sales_orderline_id');
-        $mapper->column('SALES_FARE_PRODUCT_ID','sales_fare_product_id');
+        $mapper->column('SALES_FARE_PRODUCT_ID', 'sales_fare_product_id');
         $mapper->column('DISTRIBUTION_CHANNEL_REF', 'distribution_channel_ref');
 
         $mapper->column('ACCOUNTING_MONTH', 'accounting_month');
@@ -123,7 +125,7 @@ class EnturSales {
         $mapper->column('POS_LOCATION_REF', 'pos_location_ref'); //nullable
         $mapper->column('POS_LOCATION_NAME', 'pos_location_name'); //nullable
         $mapper->column('POS_PRIVATECODE', 'pos_privatecode'); //nullable
-        
+
         $mapper->column('TRANSACTION_TYPE', 'transaction_type');
 
         $mapper->column('SALES_ORDER_ID', 'sales_order_id');
@@ -132,7 +134,7 @@ class EnturSales {
         $mapper->column('SALES_EXTERNAL_REFERENCE', 'sales_external_reference'); //nullable
         $mapper->column('SALES_DATE', 'sales_date')->format([static::class, 'dateFormatter']);
         $mapper->column('SALES_PRIVATECODE', 'sales_privatecode'); //nullable
-        $mapper->column('SALES_PACKAGE_REF', 'sales_package_ref'); 
+        $mapper->column('SALES_PACKAGE_REF', 'sales_package_ref');
         $mapper->column('SALES_PACKAGE_NAME', 'sales_package_name');
         $mapper->column('SALES_DISCOUNT_RIGHT_REF', 'sales_discount_right_ref'); //nullable //UNSURE of type since always empty in csv
         $mapper->column('SALES_DISCOUNT_RIGHT_NAME', 'sales_discount_right_name'); //nullable //UNSURE of type since always empty in csv
@@ -160,8 +162,8 @@ class EnturSales {
         $mapper->column('ANNEX_TAX_CODE', 'annex_tax_code');
         $mapper->column('ANNEX_TAX_RATE', 'annex_tax_rate');
 
-        $mapper->column('LINE_ID','line_id');
-        $mapper->column('LINE_ACCOUNTING_DATE', 'line_accounting_date')->format([static::class, 'dateFormatter']);;
+        $mapper->column('LINE_ID', 'line_id');
+        $mapper->column('LINE_ACCOUNTING_DATE', 'line_accounting_date')->format([static::class, 'dateFormatter']);
         $mapper->column('LINE_CATEGORY_REF', 'line_category_ref');
         $mapper->column('LINE_CATEGORY_DESCRIPTION', 'line_category_description');
         $mapper->column('LINE_AMOUNT', 'line_amount');

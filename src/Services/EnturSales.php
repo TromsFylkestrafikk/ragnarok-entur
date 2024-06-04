@@ -53,10 +53,7 @@ class EnturSales {
 
     public function download($chunkId): SinkFile|null
     {
-        $token = $this->cleosApi->getApiToken();
-        $this->debug("TOKEN IS: %s", $token);
-        
-        
+        $token = $this->cleosApi->getApiToken(); 
 
         $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
             ->get($this->getCleosS1Url($chunkId));
@@ -71,6 +68,9 @@ class EnturSales {
             $this->xEnturReportId = $nextReport;
             $archive->save();
             return $archive->getFile();
+        } else if($status == 202) 
+        {
+            $this->debug("Error: No Data on remote server for chunkId: %s", $chunkId);
         }
         return null;
     }

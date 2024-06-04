@@ -3,16 +3,20 @@
 namespace Ragnarok\Entur\Sinks;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Ragnarok\Entur\Services\EnturSales;
 use Ragnarok\Sink\Models\SinkFile;
+use Ragnarok\Sink\Sinks\SinkBase;
 
-class SinkEnturSales extends SinkEnturBase
+class SinkEnturSales extends SinkBase
 {
     public static $id = "entur-sales";
     public static $title = "Entur Salesdata";
     public $cron = '30 04 * * *';
 
     protected $service;
+
+    public $singleState = false;
 
     public function __construct()
     {
@@ -39,7 +43,8 @@ class SinkEnturSales extends SinkEnturBase
     {
         $tables = $this->destinationTables();
 
-        foreach ($tables as $table) {
+        $tableKeys = array_keys($tables);
+        foreach ($tableKeys as $table) {
             DB::table($table)->where('chunk_id', $id)->delete();
         }
 
@@ -49,5 +54,22 @@ class SinkEnturSales extends SinkEnturBase
     public function destinationTables(): array
     {
         return $this->service->destinationTables();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFromDate(): Carbon
+    {
+        // Lets use already provided/stored data as initial date.
+        return Carbon::parse("2024-03-07");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getToDate(): Carbon
+    {
+        return Carbon::today();
     }
 }

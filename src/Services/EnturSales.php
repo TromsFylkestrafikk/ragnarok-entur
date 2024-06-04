@@ -92,13 +92,13 @@ class EnturSales
     public function destinationTables(): array
     {
         return [
-            'entur_product_sales'
+            'entur_product_sales' => 'Salgsdokumentasjon pr avtale, kjøres programatisk ved daglig saldering'
         ];
     }
 
     protected function importFromCsv(string $path, string $chunkId)
     {
-        $mapper = new CsvToTable($path, $this->destinationTables()[0], ['SALES_ORDERLINE_ID', 'SALES_FARE_PRODUCT_ID']);
+        $mapper = new CsvToTable($path, 'entur_product_sales', ['SALES_ORDERLINE_ID', 'SALES_FARE_PRODUCT_ID']);
         $mapper->prepareCsvReader(function (Reader $csv) {
             $csv->setDelimiter(';');
         });

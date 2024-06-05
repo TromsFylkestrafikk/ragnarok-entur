@@ -36,7 +36,6 @@ class CleosAuthToken
     public function getApiToken(): string
     {
         if ($this->apiToken !== null && $this->tokenExpires->isAfter(Carbon::now())) {
-            $this->debug("HAS TOKEN");
             return $this->apiToken;
         }
         $this->debug('Requesting API token from EnTur.');
@@ -63,5 +62,4 @@ class CleosAuthToken
     {
         return rtrim(config('ragnarok_entur.cleos.audience'), '/');
     }
-
 }

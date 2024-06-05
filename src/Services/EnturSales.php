@@ -21,25 +21,22 @@ class EnturSales
 
     protected $sinkDisk;
     protected $cleosApi;
-    protected $xEnturReportId;
-
 
     public function __construct()
     {
         $disk = new SinkDisk(SinkEnturSales::$id);
-        $this->xEnturReportId = 0;
         $this->sinkDisk = $disk->getDisk();
         $this->cleosApi = new CleosAuthToken();
         $this->logPrintfInit("[EnTur CLEOS]: ");
     }
 
-    public function getCleosS1Url($chunkId): string
+    public function getCleosS1Url($chunkId, $afterReportId): string
     {
         $urlToUse = sprintf(
             "%s/%s/%s",
             EnturCleosApi::getApiUrl(),
             config('ragnarok_entur.cleos.api_path'),
-            "partner-reports/report/next/content?templateId=1015&idAfter={$this->xEnturReportId}&firstOrderedDate={$chunkId}"
+            "partner-reports/report/next/content?templateId=1015&idAfter={$afterReportId}&firstOrderedDate={$chunkId}"
         );
 
         $this->debug("URL TO USE: %s", $urlToUse);
@@ -58,24 +55,48 @@ class EnturSales
 
     public function download($chunkId): SinkFile|null
     {
-        $token = $this->cleosApi->getApiToken();
-
         $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
-            ->get($this->getCleosS1Url($chunkId));
+            ->get($this->getCleosS1Url($chunkId, 0));
 
         $this->debug("status: %d", $response->status());
+
         $status = $response->status();
-        if ($status == 200) {
-            $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
-            $archive->addFromString("CLEOS-S1-{$chunkId}.csv", $response->body());
-            $nextReport = intval($response->header("x-entur-report-id"));
-            $this->xEnturReportId = $nextReport;
-            $archive->save();
-            return $archive->getFile();
-        } elseif ($status == 202) {
-            $this->debug("Error: No Data on remote server for chunkId: %s", $chunkId);
+
+        $archive = null;
+        $chunkDate = Carbon::parse($chunkId)->subDay()->format("Y-m-d");
+
+        while ($status == 200 && is_null($archive)) {
+            $reportID = intval($response->header("x-entur-report-id"));
+            $contentDisposition = $response->header("content-disposition");
+            $fileName = preg_split('/[ =]/', $contentDisposition, -1, PREG_SPLIT_NO_EMPTY)[2];
+
+            $matches = null;
+            preg_match('/\\d{4}-\\d{2}-\\d{2}/', $fileName, $matches);
+
+            if (is_null($matches)) {
+                return null;
+            }
+
+            $fileDate = $matches[0];
+
+            if (strcmp($chunkDate, $fileDate) == 0) {
+                $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
+                $archive->addFromString($fileName, $response->body());
+                $archive->save();
+
+                $this->debug("Saving file %s, %s", $fileDate, $chunkDate);
+            } else {
+                $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
+                    ->get($this->getCleosS1Url($chunkId, $reportID));
+            }
         }
-        return null;
+
+        if (is_null($archive)) {
+            $this->debug("NO report found for chunkId: %s", $chunkId);
+            return $archive;
+        }
+
+        return $archive->getFile();
     }
 
     public function import(string $chunkId, SinkFile $file)

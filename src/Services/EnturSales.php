@@ -66,6 +66,10 @@ class EnturSales
 
         $chunkDate = Carbon::parse($chunkId)->subDay()->format("Y-m-d");
 
+        // CLEOS won't start generating reports until first Working Day of the month.
+        // Because of this we need to check for corret file when fetching
+        // files for the first few days of any given month. We use ID of report (reportID)
+        // to fetch next, and use date given in filename to see if the corret report is given
         while ($status == 200 && is_null($archive)) {
             $reportID = intval($response->header("x-entur-report-id"));
             $contentDisposition = $response->header("content-disposition");
@@ -82,6 +86,9 @@ class EnturSales
 
             $fileDate = $matches[0];
 
+            // Checking for either chunkId - 1day ($chunkDate) or chunkId (today)
+            // since there seems to be a tiny discrepency in when files are made
+            // available for download.
             if (strcmp($chunkDate, $fileDate) == 0 || strcmp($chunkId, $fileDate) == 0) {
                 $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
                 $archive->addFromString($fileName, $response->body());

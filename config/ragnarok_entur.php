@@ -19,11 +19,11 @@ return [
     ],
 
     'cleos' => [
-        'auth_url' => env('CLEOS_AUTH_URL'),
-        'client_id' => env('CLEOS_CLIENT_ID'),
-        'client_secret' => env('CLEOS_SECRET'),
-        'audience' => env('CLEOS_AUDIENCE'),
-        'api_path' => trim(env('CLEOS_API_PATH'), '/'),
+        'auth_url' => env('ENTUR_CLEOS_AUTH_URL'),
+        'client_id' => env('ENTUR_CLEOS_CLIENT_ID'),
+        'client_secret' => env('ENTUR_CLEOS_SECRET'),
+        'audience' => env('ENTUR_CLEOS_AUDIENCE'),
+        'api_path' => trim(env('ENTUR_CLEOS_API_PATH'), '/'),
     ],
 
     'routedata' => [

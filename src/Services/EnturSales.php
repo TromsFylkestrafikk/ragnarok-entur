@@ -63,12 +63,15 @@ class EnturSales
         $status = $response->status();
 
         $archive = null;
+
         $chunkDate = Carbon::parse($chunkId)->subDay()->format("Y-m-d");
 
         while ($status == 200 && is_null($archive)) {
             $reportID = intval($response->header("x-entur-report-id"));
             $contentDisposition = $response->header("content-disposition");
             $fileName = preg_split('/[ =]/', $contentDisposition, -1, PREG_SPLIT_NO_EMPTY)[2];
+
+            $this->debug("FILE: %s", $fileName);
 
             $matches = null;
             preg_match('/\\d{4}-\\d{2}-\\d{2}/', $fileName, $matches);
@@ -79,7 +82,7 @@ class EnturSales
 
             $fileDate = $matches[0];
 
-            if (strcmp($chunkDate, $fileDate) == 0) {
+            if (strcmp($chunkDate, $fileDate) == 0 || strcmp($chunkId, $fileDate) == 0) {
                 $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
                 $archive->addFromString($fileName, $response->body());
                 $archive->save();
@@ -88,6 +91,7 @@ class EnturSales
             } else {
                 $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
                     ->get($this->getCleosS1Url($chunkId, $reportID));
+                $status = $response->status();
             }
         }
 

@@ -5,6 +5,7 @@ namespace Ragnarok\Entur;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Ragnarok\Entur\Sinks\SinkEnturRoutes;
+use Ragnarok\Entur\Sinks\SinkEnturSales;
 use Ragnarok\Entur\Sinks\SinkEnturStops;
 use Ragnarok\Entur\Services\EnturAuthToken;
 use Ragnarok\Sink\Facades\SinkRegistrar;
@@ -25,8 +26,11 @@ class EnturServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/ragnarok_entur.php', 'ragnarok_entur');
         $this->publishConfig();
 
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
         SinkRegistrar::register(SinkEnturRoutes::class);
         SinkRegistrar::register(SinkEnturStops::class);
+        SinkRegistrar::register(SinkEnturSales::class);
     }
 
     /**

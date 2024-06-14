@@ -64,6 +64,7 @@ class EnturSales
         // Prepearing datestrings for selecting correct file.
         $chunkDate = Carbon::parse($chunkId)->format("Ymd");
         $chunkDatePrevious = Carbon::parse($chunkId)->subDay()->format("Ymd");
+        $chunkIdPrevious = Carbon::parse($chunkId)->subDay()->format("Y-m-d");
 
         // CLEOS won't start generating reports until first Working Day of the month.
         // Because of this we need to check for corret file when fetching
@@ -77,13 +78,20 @@ class EnturSales
             $this->debug("FILE: %s", $fileName);
 
             $matches = null;
-            preg_match('/\d{8}/', $fileName, $matches);
+            // match for date on format YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD or YYYYMMDD
+            // matches years in range (inclusive) 2000-3999
+            preg_match(
+                '/[^\d](?<date>((2|3)\d{3})([-\/\.])*(0[1-9]|1[0,1,2])([-\/\.])*(0[1-9]|[12][0-9]|3[01]))/',
+                $fileName,
+                $matches
+            );
 
-            if (!isset($matches[0])) {
+            if (!isset($matches['date'])) {
                 return null;
             }
 
-            $fileDate = $matches[0];
+            // Fecth date match from preg_match, and make it same format as $chunkDate* variables
+            $fileDate = preg_replace('/[-\/\.]/', '', $matches['date']);
 
             // Checking for either chunkId - 1day ($chunkDate) or chunkId (today)
             // since there seems to be a tiny discrepency in when files are made

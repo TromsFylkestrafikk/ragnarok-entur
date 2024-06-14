@@ -39,7 +39,6 @@ class EnturSales
             "partner-reports/report/next/content?templateId=1015&idAfter={$afterReportId}&firstOrderedDate={$chunkId}"
         );
 
-        $this->debug("URL TO USE: %s", $urlToUse);
         return $urlToUse;
     }
 
@@ -58,13 +57,13 @@ class EnturSales
         $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
             ->get($this->getCleosS1Url($chunkId, 0));
 
-        $this->debug("status: %d", $response->status());
-
         $status = $response->status();
 
         $archive = null;
 
-        $chunkDate = Carbon::parse($chunkId)->subDay()->format("Y-m-d");
+        // Prepearing datestrings for selecting correct file.
+        $chunkDate = Carbon::parse($chunkId)->format("Ymd");
+        $chunkDatePrevious = Carbon::parse($chunkId)->subDay()->format("Ymd");
 
         // CLEOS won't start generating reports until first Working Day of the month.
         // Because of this we need to check for corret file when fetching
@@ -78,9 +77,9 @@ class EnturSales
             $this->debug("FILE: %s", $fileName);
 
             $matches = null;
-            preg_match('/\\d{4}-\\d{2}-\\d{2}/', $fileName, $matches);
+            preg_match('/\d{8}/', $fileName, $matches);
 
-            if (is_null($matches)) {
+            if (!isset($matches[0])) {
                 return null;
             }
 
@@ -89,7 +88,7 @@ class EnturSales
             // Checking for either chunkId - 1day ($chunkDate) or chunkId (today)
             // since there seems to be a tiny discrepency in when files are made
             // available for download.
-            if (strcmp($chunkDate, $fileDate) == 0 || strcmp($chunkId, $fileDate) == 0) {
+            if (strcmp($chunkDate, $fileDate) == 0 || strcmp($chunkDatePrevious, $fileDate) == 0) {
                 $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
                 $archive->addFromString($fileName, $response->body());
                 $archive->save();

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('entur_product_sales', function (Blueprint $table) 
+        Schema::create('entur_product_sales', function (Blueprint $table)
         {
             //$table->id('id');
             $table->bigInteger('group_id')->comment("The GL Batch ID used to select the dataset");
@@ -24,9 +24,9 @@ return new class extends Migration
 
             $table->string('distribution_channel_ref')->comment("ID of the Distribution Channel");
 
-            $table->integer('pos_provider_ref')->comment("The Org ID that operates the POS on behalf of the supplier (normally an Operator)"); 
+            $table->integer('pos_provider_ref')->comment("The Org ID that operates the POS on behalf of the supplier (normally an Operator)");
             $table->integer('pos_supplier_ref')->comment("The supplier of this POS, this is usually the Authority Org ID that the Operator has a transport
-            agreement with"); 
+            agreement with");
             $table->string('pos_ref')->comment("ID of the Point Of Sale");
             $table->string('pos_name')->nullable()->comment("NOTE: No data in source");
             $table->string('pos_location_ref')->nullable()->comment("NOTE: No data in source. Unique ID of the POS Location");
@@ -71,7 +71,7 @@ return new class extends Migration
             $table->integer('annex_tax_code')->comment("The original Tax Code of the PriceContribution, if any")->nullable();
             $table->integer('annex_tax_rate')->comment("The Tax Rate of the PriceContribution for this Annex")->nullable();
 
-            $table->biginteger('line_id')->comment("Line ID");
+            $table->bigInteger('line_id')->comment("Line ID");
             $table->date('line_accounting_date')->comment("The Accounting Date of the line");
             $table->string('line_category_ref')->comment("The ID of the CLEOS Mapping used to produce the line");
             $table->string('line_category_description')->comment("The name of the CLEOS Mapping used to produce the line");

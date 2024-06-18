@@ -4,3 +4,4 @@
 ### Added
 - Sink for NSR stop places
 - Sink for NeTEx route data for Troms
+- Sink for CLEOS sales data for Troms

@@ -17,7 +17,7 @@
         "illuminate/console": "^10.0",
         "illuminate/database": "^10.0",
         "illuminate/support": "^10.0",
-        "ragnarok/sink": "^0.1.0",
+        "ragnarok/sink": "dev-main",
         "tromsfylkestrafikk/laravel-netex": "0.2.0"
     },
     "require-dev": {

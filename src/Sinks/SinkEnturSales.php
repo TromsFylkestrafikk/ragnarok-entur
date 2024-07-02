@@ -13,6 +13,7 @@ class SinkEnturSales extends SinkBase
     public static $id = "entur-sales";
     public static $title = "Entur Salesdata";
     public $cron = '30 04 * * *';
+    public static $docfileName = "docs/SINK-SALES.md";
 
     protected $service;
 

@@ -9,4 +9,4 @@ Provides timetables and stop places. The stops referred to are defined in the na
 
 ## Source
 
-Entur is the national registry for all public transport in Norway. The registry contains data about daily departures and routes. This includes name, type, latitude, longitude, valid to/from date.
+Entur is the national registry for all public transport in Norway. The registry contains data about daily departures and routes. This includes name, type, latitude, longitude, valid to/from date and stop places.

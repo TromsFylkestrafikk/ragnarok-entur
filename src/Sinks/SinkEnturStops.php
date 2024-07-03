@@ -14,6 +14,7 @@ class SinkEnturStops extends SinkEnturBase
     public static $id = "entur-stops";
     public static $title = "Entur Stops";
     public $singleState = true;
+    public static $docfileName = "docs/SINK-STOPS.md";
 
     /**
      * Run import daily at 04:30

@@ -1,11 +1,10 @@
-# Entur Sales
+# Entur Stops
 
 Stop places from the National Stop Register (NSR).
 
 ## Data
 
 This sink provides data detailed information regarding stop places and quays
-
 
 ## Source
 

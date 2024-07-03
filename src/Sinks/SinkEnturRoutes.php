@@ -15,6 +15,7 @@ class SinkEnturRoutes extends SinkEnturBase
 {
     public static $id = "entur-routes";
     public static $title = "Entur Routedata";
+    public static $docfileName = "docs/SINK-ROUTES.md";
 
     /**
      * @var EnturNetex

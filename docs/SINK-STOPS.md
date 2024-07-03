@@ -1,4 +1,4 @@
-# Entur Sales
+# Entur Stops
 
 Stop places from the National Stop Register (NSR).
 

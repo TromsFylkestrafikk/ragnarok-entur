@@ -21,12 +21,15 @@ class EnturSales
 
     protected $sinkDisk;
     protected $cleosApi;
+    protected $UTF8BOM; // Initialized in constructur = chr(239) . chr(187) . chr(191);
+
 
     public function __construct()
     {
         $disk = new SinkDisk(SinkEnturSales::$id);
         $this->sinkDisk = $disk->getDisk();
         $this->cleosApi = new CleosAuthToken();
+        $this->UTF8BOM = chr(239) . chr(187) . chr(191); // 0xEF 0xBB 0xBF
         $this->logPrintfInit("[EnTur CLEOS]: ");
     }
 
@@ -97,8 +100,12 @@ class EnturSales
             // since there seems to be a tiny discrepency in when files are made
             // available for download.
             if (strcmp($chunkDate, $fileDate) == 0 || strcmp($chunkDatePrevious, $fileDate) == 0) {
+                $csvData = $response->body();
+                if (mb_detect_encoding($csvData) === 'UTF-8' && substr($csvData, 0, 3) !== $this->UTF8BOM) {
+                    $csvData = $this->UTF8BOM . $csvData;
+                }
                 $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
-                $archive->addFromString($fileName, $response->body());
+                $archive->addFromString($fileName, $csvData);
                 $archive->save();
 
                 $this->debug("Saving file %s, %s", $fileDate, $chunkDate);

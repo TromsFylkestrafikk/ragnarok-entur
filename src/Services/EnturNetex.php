@@ -10,7 +10,6 @@ use Ragnarok\Sink\Models\SinkFile;
 use Ragnarok\Sink\Services\LocalFile;
 use Ragnarok\Sink\Services\ChunkExtractor;
 use Ragnarok\Sink\Traits\LogPrintf;
-use TromsFylkestrafikk\Netex\Console\NeTEx\NetexDatabase;
 use TromsFylkestrafikk\Netex\Models\Import;
 
 /**
@@ -68,7 +67,6 @@ class EnturNetex
         Artisan::call('netex:routedata-import', [
             '--force' => true,
             'path' => $extractor->getDestDir(),
-            'main' => config('ragnarok_entur.routedata.main_xml'),
         ]);
         return 0;
     }
@@ -87,7 +85,6 @@ class EnturNetex
             return false;
         }
         $this->debug('Netex import found. Removing …');
-        new NetexDatabase();
         Artisan::call('netex:routedata-remove', ['--id' => $netexImport->id]);
         return true;
     }

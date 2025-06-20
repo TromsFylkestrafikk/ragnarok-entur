@@ -27,7 +27,6 @@ return [
     ],
 
     'routedata' => [
-        'main_xml' => env('ENTUR_ROUTEDATA_XML_MAIN', '_Shared_data.xml'),
         'activation_period' => env('ENTUR_ROUTEDATA_PERIOD', 'P30D'),
     ],
 

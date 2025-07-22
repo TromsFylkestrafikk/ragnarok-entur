@@ -3,6 +3,7 @@
 namespace Ragnarok\Entur\Services;
 
 use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Promise\Utils;
 use Illuminate\Support\Carbon;
 use League\Csv\Reader;
 use Ragnarok\Sink\Traits\LogPrintf;
@@ -26,20 +27,7 @@ class EnturSales
     {
         $disk = new SinkDisk(SinkEnturSales::$id);
         $this->sinkDisk = $disk->getDisk();
-        $this->cleosApi = new CleosAuthToken();
         $this->logPrintfInit("[EnTur CLEOS]: ");
-    }
-
-    public function getCleosS1Url($chunkId, $afterReportId): string
-    {
-        $urlToUse = sprintf(
-            "%s/%s/%s",
-            EnturCleosApi::getApiUrl(),
-            config('ragnarok_entur.cleos.api_path'),
-            "partner-reports/report/next/content?templateId=1015&idAfter={$afterReportId}&firstOrderedDate={$chunkId}"
-        );
-
-        return $urlToUse;
     }
 
     public static function dateFormatter($date)
@@ -54,65 +42,60 @@ class EnturSales
 
     public function download($chunkId): SinkFile|null
     {
-        $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
-            ->get($this->getCleosS1Url($chunkId, 0));
-
-        $status = $response->status();
-
-        $archive = null;
-
-        // Prepearing datestrings for selecting correct file.
-        $chunkDate = Carbon::parse($chunkId)->format("Ymd");
-        $chunkDatePrevious = Carbon::parse($chunkId)->subDay()->format("Ymd");
-        $chunkIdPrevious = Carbon::parse($chunkId)->subDay()->format("Y-m-d");
-
-        // CLEOS won't start generating reports until first Working Day of the month.
-        // Because of this we need to check for corret file when fetching
-        // files for the first few days of any given month. We use ID of report (reportID)
-        // to fetch next, and use date given in filename to see if the corret report is given
-        while ($status == 200 && is_null($archive)) {
-            $reportID = intval($response->header("x-entur-report-id"));
-            $contentDisposition = $response->header("content-disposition");
-            $fileName = preg_split('/[ =]/', $contentDisposition, -1, PREG_SPLIT_NO_EMPTY)[2];
-
-            $this->debug("FILE: %s", $fileName);
-
-            $matches = null;
-            // match for date on format YYYY-MM-DD, YYYY/MM/DD, YYYY.MM.DD or YYYYMMDD
-            // matches years in range (inclusive) 2000-3999
-            preg_match(
-                '/[^\d](?<date>((2|3)\d{3})([-\/\.])*(0[1-9]|1[0,1,2])([-\/\.])*(0[1-9]|[12][0-9]|3[01]))/',
-                $fileName,
-                $matches
-            );
-
-            if (!isset($matches['date'])) {
-                return null;
-            }
-
-            // Fecth date match from preg_match, and make it same format as $chunkDate* variables
-            $fileDate = preg_replace('/[-\/\.]/', '', $matches['date']);
-
-            // Checking for either chunkId - 1day ($chunkDate) or chunkId (today)
-            // since there seems to be a tiny discrepency in when files are made
-            // available for download.
-            if (strcmp($chunkDate, $fileDate) == 0 || strcmp($chunkDatePrevious, $fileDate) == 0) {
-                $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
-                $archive->addFromString($fileName, $response->body());
-                $archive->save();
-
-                $this->debug("Saving file %s, %s", $fileDate, $chunkDate);
-            } else {
-                $response = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()])
-                    ->get($this->getCleosS1Url($chunkId, $reportID));
-                $status = $response->status();
-            }
+        $client = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()]);
+        //$response = $client->get(EnturCleosApi::getNextDatasetInProduct(0, $chunkId));
+        //$nextDatasetResult = $client->get(EnturCleosApi::getNextDatasetInProductUrl(0, '2024-12-01'));
+        $nextDatasetResult = $client->get(EnturCleosApi::getNextDatasetInProductUrl(0, $chunkId));
+        $status = $nextDatasetResult->status();
+        if ($status != 200) {
+            $this->debug("STATUS nextDataset: %s", $status);
+            return null;
         }
 
-        if (is_null($archive)) {
-            $this->debug("NO report found for chunkId: %s", $chunkId);
-            return $archive;
+        // next dataset id
+        $datasetId = (int)$nextDatasetResult->body();
+
+        $datasetResult = $client->get(EnturCleosApi::getDatasetUrl($datasetId));
+        $datasetStatus = $datasetResult->status();
+        if ($datasetStatus != 200) {
+            $this->debug("STATUS dataset: %s", $datasetStatus);
+            return null;
         }
+
+        $createReportResult = $client->post(EnturCleosApi::getReportCreateUrl($datasetId));
+        if ($createReportResult->status() != 201) {
+            $this->debug("STATUS createReport: %s", $createReportResult->status());
+            return null;
+        }
+
+        // Poll to check if report is completed
+        $createReportBody = json_decode($createReportResult->body());
+        $reportId = $createReportBody->id;
+        $client->async();
+        do {
+            $promises = [$client->get(EnturCleosApi::getReportStatusUrl($reportId))];
+            $promisesCombines = Utils::all($promises);
+            $reportStatusResult = $promisesCombines->wait();
+        } while ($reportStatusResult[0]->status() == 202);
+
+        if ($reportStatusResult[0]->status() != 200) {
+            $this->debug("STATUS pollCheck %s", $reportStatusResult[0]->status());
+            return null;
+        }
+
+        $reportResultBody = json_decode($reportStatusResult[0]->body());
+
+        $client->async(false);
+        $downloadResult = $client->get($reportResultBody->signedBucketUrl);
+
+        if ($downloadResult->status() != 200) {
+            $this->debug("STATUS download report %s", $downloadResult->status());
+            return null;
+        }
+
+        $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
+        $archive->addFromString($reportResultBody->reportName, $downloadResult->body());
+        $archive->save();
 
         return $archive->getFile();
     }
@@ -214,10 +197,7 @@ class EnturSales
 
 
 
-        return $mapper->
-            exec()->
-            logSummary()->
-            getProcessedRecords();
+        return $mapper->exec()->logSummary()->getProcessedRecords();
     }
 
     public function makeTargetFilename(): string

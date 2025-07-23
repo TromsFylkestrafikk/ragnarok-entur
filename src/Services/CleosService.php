@@ -70,12 +70,13 @@ class CleosService
      */
     public function getNextDatasetInProductUrl($reportId, $chunckId)
     {
-        //TODO: ProductId == 1056 should probably NOT be hardcoded
         $urlToUse = sprintf(
-            "%s/%s/%s",
+            "%s/%s/%s/%s/%s",
             CleosService::getApiUrl(),
             config('ragnarok_entur.cleos.api_path'),
-            "partner-data/dataproduct/1056/next?idAfter={$reportId}&fromDate={$chunckId}"
+            "partner-data/dataproduct",
+            config('ragnarok_entur.cleos.data_product_version'),
+            "next?idAfter={$reportId}&fromDate={$chunckId}"
         );
         return $urlToUse;
     }

@@ -4,6 +4,7 @@ namespace Ragnarok\Entur\Services;
 
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Promise\Utils;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use League\Csv\Reader;
 use Ragnarok\Sink\Traits\LogPrintf;
@@ -42,62 +43,35 @@ class EnturSales
 
     public function download($chunkId): SinkFile|null
     {
-        $client = Http::withHeaders(['authorization' => 'Bearer ' . EnturCleosApi::getApiToken()]);
-        //$response = $client->get(EnturCleosApi::getNextDatasetInProduct(0, $chunkId));
-        //$nextDatasetResult = $client->get(EnturCleosApi::getNextDatasetInProductUrl(0, '2024-12-01'));
-        $nextDatasetResult = $client->get(EnturCleosApi::getNextDatasetInProductUrl(0, $chunkId));
-        $status = $nextDatasetResult->status();
-        if ($status != 200) {
-            $this->debug("STATUS nextDataset: %s", $status);
+        $client = Http::withHeaders([
+            'authorization' => 'Bearer ' . EnturCleosApi::getApiToken()
+        ]);
+
+        $datasetId = $this->fetchNextDataSetId($client, $chunkId);
+        if ($datasetId === null) {
             return null;
         }
 
-        // next dataset id
-        $datasetId = (int)$nextDatasetResult->body();
-
-        $datasetResult = $client->get(EnturCleosApi::getDatasetUrl($datasetId));
-        $datasetStatus = $datasetResult->status();
-        if ($datasetStatus != 200) {
-            $this->debug("STATUS dataset: %s", $datasetStatus);
+        if (!$this->checkDataSetExists($client, $datasetId)) {
             return null;
         }
 
-        $createReportResult = $client->post(EnturCleosApi::getReportCreateUrl($datasetId));
-        if ($createReportResult->status() != 201) {
-            $this->debug("STATUS createReport: %s", $createReportResult->status());
+        $reportId = $this->createReportFormattingJob($client, $datasetId);
+        if ($reportId === null) {
             return null;
         }
 
-        // Poll to check if report is completed
-        $createReportBody = json_decode($createReportResult->body());
-        $reportId = $createReportBody->id;
-        $client->async();
-        do {
-            $promises = [$client->get(EnturCleosApi::getReportStatusUrl($reportId))];
-            $promisesCombines = Utils::all($promises);
-            $reportStatusResult = $promisesCombines->wait();
-        } while ($reportStatusResult[0]->status() == 202);
-
-        if ($reportStatusResult[0]->status() != 200) {
-            $this->debug("STATUS pollCheck %s", $reportStatusResult[0]->status());
+        $report = $this->pollReportStatus($client, $reportId);
+        if ($report === null) {
             return null;
         }
 
-        $reportResultBody = json_decode($reportStatusResult[0]->body());
-
-        $client->async(false);
-        $downloadResult = $client->get($reportResultBody->signedBucketUrl);
-
-        if ($downloadResult->status() != 200) {
-            $this->debug("STATUS download report %s", $downloadResult->status());
+        $reportContent = $this->downloadReport($client, $report->signedBucketUrl);
+        if ($reportContent === null) {
             return null;
         }
 
-        $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
-        $archive->addFromString($reportResultBody->reportName, $downloadResult->body());
-        $archive->save();
-
-        return $archive->getFile();
+        return $this->storeReport($chunkId, $report->reportName, $reportContent);
     }
 
     public function import(string $chunkId, SinkFile $file)
@@ -116,6 +90,80 @@ class EnturSales
         return [
             'entur_product_sales' => 'Salgsdokumentasjon pr avtale, kjøres programatisk ved daglig saldering'
         ];
+    }
+
+    protected function fetchNextDataSetId($client, $chunkId): int|null
+    {
+        $response = $client->get(EnturCleosApi::getNextDatasetInProductUrl(0, $chunkId));
+        $status = $response->status();
+        if ($status !== Response::HTTP_OK) {
+            $this->debug("STATUS fetchNextDatasetId: %s", $status);
+            return null;
+        }
+
+        // next dataset id
+        return (int)$response->body();
+    }
+
+    protected function checkDatasetExists($client, int $datasetId): bool
+    {
+        $response = $client->get(EnturCleosApi::getDatasetUrl($datasetId));
+        if ($response->status() !== Response::HTTP_OK) {
+            $this->debug("STATUS checkDatasetExists: %s", $response->status());
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function createReportFormattingJob($client, int $datasetId): string|null
+    {
+        $response = $client->post(EnturCleosApi::getReportCreateUrl($datasetId));
+        if ($response->status() !== Response::HTTP_CREATED) {
+            $this->debug("STATUS createReportFormattingJob: %s", $response->status());
+            return null;
+        }
+
+        $body = json_decode($response->body());
+        return $body->id ?? null;
+    }
+
+    protected function pollReportStatus($client, string $reportId): object|null
+    {
+        $client->async();
+        do {
+            $promises = [$client->get(EnturCleosApi::getReportStatusUrl($reportId))];
+            $responses = Utils::all($promises)->wait();
+        } while ($responses[0]->status() === Response::HTTP_ACCEPTED);
+
+        $client->async(false);
+
+        if ($responses[0]->status() !== Response::HTTP_OK) {
+            $this->debug("STATUS pollCheck %s", $responses[0]->status());
+            return null;
+        }
+
+        return json_decode($responses[0]->body());
+    }
+
+    protected function downloadReport($client, string $url): string|null
+    {
+        $response = $client->get($url);
+        if ($response->status() !== Response::HTTP_OK) {
+            $this->debug("STATUS download report %s", $response->status());
+            return null;
+        }
+
+        return $response->body();
+    }
+
+    protected function storeReport($chunkId, string $reportName, string $reportContent): SinkFile
+    {
+        $archive = new ChunkArchive(SinkEnturSales::$id, $chunkId);
+        $archive->addFromString($reportName, $reportContent);
+        $archive->save();
+
+        return $archive->getFile();
     }
 
     protected function importFromCsv(string $path, string $chunkId)

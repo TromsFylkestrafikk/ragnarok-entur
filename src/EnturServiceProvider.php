@@ -4,6 +4,7 @@ namespace Ragnarok\Entur;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Ragnarok\Entur\Services\CleosService;
 use Ragnarok\Entur\Sinks\SinkEnturRoutes;
 use Ragnarok\Entur\Sinks\SinkEnturSales;
 use Ragnarok\Entur\Sinks\SinkEnturStops;
@@ -14,6 +15,7 @@ class EnturServiceProvider extends ServiceProvider
 {
     public $singletons = [
         EnturAuthToken::class => EnturAuthToken::class,
+        CleosService::class => CleosService::class,
     ];
 
     /**
@@ -60,10 +62,10 @@ class EnturServiceProvider extends ServiceProvider
     }
 
     /**
-    * Get route group configuration array.
-    *
-    * @return array
-    */
+     * Get route group configuration array.
+     *
+     * @return array
+     */
     protected function routeConfiguration(): array
     {
         return [

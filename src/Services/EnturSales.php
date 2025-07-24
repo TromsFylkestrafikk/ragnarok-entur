@@ -188,8 +188,8 @@ class EnturSales
         $mapper->column('AGREEMENT_REF', 'agreement_ref');
         $mapper->column('AGREEMENT_NAME', 'agreement_description');
 
-        $mapper->column('POS_PROVIDER_REF', 'pos_provider_ref');  //SEE IF I CAN STRIP NAMESPACE (EOS:Organisation)
-        $mapper->column('POS_SUPPLIER_REF', 'pos_supplier_ref');  //SEE IF I CAN STRIP NAMESPACE (EOS:Organisation)
+        $mapper->column('POS_PROVIDER_REF', 'pos_provider_ref');
+        $mapper->column('POS_SUPPLIER_REF', 'pos_supplier_ref');
         $mapper->column('POS_REF', 'pos_ref');
         $mapper->column('POS_NAME', 'pos_name'); //nullable
         $mapper->column('POS_LOCATION_REF', 'pos_location_ref'); //nullable

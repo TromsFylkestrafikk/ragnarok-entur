@@ -47,14 +47,13 @@ class EnturSales
             'authorization' => 'Bearer ' . EnturCleosApi::getApiToken()
         ]);
 
-        $correctDate = true;
+        $continueProcessing = true;
 
         $archive = null;
 
         $datasetId = $this->fetchNextDataSetId($client, $chunkId, 0);
-        while ($datasetId !== null && $correctDate) {
-            $this->debug("Processing dataset ID: %s", $datasetId);
-            $this->debug("Processing chunk ID: %s", $chunkId);
+        while ($datasetId !== null && $continueProcessing) {
+            $this->debug("Processing dataset ID: %s, chunkId: %s", $datasetId, $chunkId);
             $chunkDate = Carbon::parse($chunkId)->format("Ymd");
 
             $datasetMetadata = $this->getDatasetMetaData($client, $datasetId);
@@ -62,10 +61,10 @@ class EnturSales
                 return null;
             }
 
-            $this->debug("Dataset order date: %s", $datasetMetadata->orderDate);
-
             $orderDate = Carbon::parse($datasetMetadata->orderDate)->format("Ymd");
-            if ($orderDate === $chunkDate) {
+            $orderBy = $datasetMetadata->orderBy;
+
+            if ($orderDate === $chunkDate && $orderBy === 'CLEOS') {
                 $reportId = $this->createReportFormattingJob($client, $datasetId);
                 if ($reportId === null) {
                     return null;
@@ -87,7 +86,7 @@ class EnturSales
 
                 $archive->addFromString($report->reportName, $reportContent);
             } else {
-                $correctDate = false;
+                $continueProcessing = false;
             }
 
             $datasetId = $this->fetchNextDataSetId($client, $chunkId, $datasetId);
@@ -130,22 +129,6 @@ class EnturSales
 
         // next dataset id
         return (int)$response->body();
-    }
-
-    protected function checkDatasetExists($client, int $datasetId): bool
-    {
-        $response = $client->get(EnturCleosApi::getDatasetUrl($datasetId));
-        if ($response->status() !== Response::HTTP_OK) {
-            $this->debug("STATUS checkDatasetExists: %s", $response->status());
-            return false;
-        }
-
-        $body = json_decode($response->body());
-        $this->debug("OrderDate: %s", $body->orderDate);
-        $this->debug("Dataset: %s", $body->datasetName);
-        $this->debug("rows: %s", $body->rows);
-
-        return true;
     }
 
     protected function getDatasetMetaData($client, int $datasetId): object|null

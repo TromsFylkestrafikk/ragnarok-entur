@@ -47,12 +47,10 @@ class EnturSales
             'authorization' => 'Bearer ' . EnturCleosApi::getApiToken()
         ]);
 
-        $continueProcessing = true;
-
         $archive = null;
 
         $datasetId = $this->fetchNextDataSetId($client, $chunkId, 0);
-        while ($datasetId !== null && $continueProcessing) {
+        while ($datasetId !== null) {
             $this->debug("Processing dataset ID: %s, chunkId: %s", $datasetId, $chunkId);
             $chunkDate = Carbon::parse($chunkId)->format("Ymd");
 
@@ -86,7 +84,7 @@ class EnturSales
 
                 $archive->addFromString($report->reportName, $reportContent);
             } else {
-                $continueProcessing = false;
+                break;
             }
 
             $datasetId = $this->fetchNextDataSetId($client, $chunkId, $datasetId);

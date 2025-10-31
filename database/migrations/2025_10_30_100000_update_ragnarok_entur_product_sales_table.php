@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Drop existing composite primary key
+        // Drop existing compound primary key
         Schema::table('entur_product_sales', function (Blueprint $table) {
             $table->dropPrimary(['group_id', 'sales_orderline_id', 'sales_fare_product_id']);
         });

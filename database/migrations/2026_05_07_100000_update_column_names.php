@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::table('entur_product_sales', function (Blueprint $table) {
             $table->renameColumn('group_id', 'gl_batch_id');
             $table->renameColumn('sales_orderline_id', 'orderline_id');
+            $table->renameColumn('sales_order_id', 'order_id');
+            $table->renameColumn('sales_order_version', 'order_version');
             $table->renameColumn('sales_fare_product_id', 'fare_product_id');
-
-
+            $table->renameColumn('sales_payment_type', 'payment_type');
             $table->renameColumn('accounting_month', 'acct_month');
             $table->renameColumn('organisation', 'agreement_org_no');
             $table->renameColumn('agreement_description', 'agreement_name');
@@ -30,7 +31,7 @@ return new class extends Migration
             $table->renameColumn('sales_start_time', 'journey_start_time');
             $table->renameColumn('sales_from_stop_place', 'leg_from_ref');
             $table->renameColumn('sales_from_stop_place_name', 'leg_from_name');
-            $table->renameColumn('sales_to_stop_place', 'leg_to_place');
+            $table->renameColumn('sales_to_stop_place', 'leg_to_ref');
             $table->renameColumn('sales_to_stop_place_name', 'leg_to_name');
             $table->renameColumn('sales_zone_count', 'interval_zone_count');
             $table->renameColumn('sales_zones_ref', 'interval_zones');
@@ -43,13 +44,11 @@ return new class extends Migration
             $table->renameColumn('line_accounting_date', 'acct_date');
             $table->renameColumn('line_category_ref', 'clearing_mapping_ref');
             $table->renameColumn('line_category_description', 'clearing_mapping_name');
-
             $table->renameColumn('line_cancellation', 'clearing_cancellation');
             $table->renameColumn('line_standard_tax_code', 'acct_standard_tax_code');
             $table->renameColumn('line_local_tax_code', 'acct_local_tax_code');
             $table->renameColumn('line_local_tax_rate', 'acct_local_tax_rate');
             $table->renameColumn('line_tax_amount', 'est_tax_amount');
-
         });
     }
 

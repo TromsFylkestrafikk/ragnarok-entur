@@ -193,15 +193,15 @@ class EnturSales
             $dbRec['chunk_id'] = $chunkId;
         });
 
-        $mapper->column('GL_BATCH_ID', 'group_id');
-        $mapper->column('ORDERLINE_ID', 'sales_orderline_id');
-        $mapper->column('FARE_PRODUCT_ID', 'sales_fare_product_id');
+        $mapper->column('GL_BATCH_ID', 'gl_batch_id');
+        $mapper->column('ORDERLINE_ID', 'orderline_id');
+        $mapper->column('FARE_PRODUCT_ID', 'fare_product_id');
         $mapper->column('DISTRIBUTION_CHANNEL_REF', 'distribution_channel_ref');
 
-        $mapper->column('ACCT_MONTH', 'accounting_month');
-        $mapper->column('AGREEMENT_ORG_NO', 'organisation');
+        $mapper->column('ACCT_MONTH', 'acct_month');
+        $mapper->column('AGREEMENT_ORG_NO', 'agreement_org_no');
         $mapper->column('AGREEMENT_REF', 'agreement_ref');
-        $mapper->column('AGREEMENT_NAME', 'agreement_description');
+        $mapper->column('AGREEMENT_NAME', 'agreement_name');
 
         $mapper->column('POS_PROVIDER_REF', 'pos_provider_ref');
         $mapper->column('POS_SUPPLIER_REF', 'pos_supplier_ref');
@@ -213,32 +213,32 @@ class EnturSales
 
         $mapper->column('TRANSACTION_TYPE', 'transaction_type');
 
-        $mapper->column('ORDER_ID', 'sales_order_id');
-        $mapper->column('ORDER_VERSION', 'sales_order_version');
-        $mapper->column('PAYMENT_TYPE', 'sales_payment_type');
-        $mapper->column('EXTERNAL_REFERENCE', 'sales_external_reference'); //nullable
-        $mapper->column('SETTLEMENT_DATE', 'sales_date')->format([static::class, 'dateFormatter']);
-        $mapper->column('SALES_PACKAGE_PRIVATECODE', 'sales_privatecode'); //nullable
+        $mapper->column('ORDER_ID', 'order_id');
+        $mapper->column('ORDER_VERSION', 'order_version');
+        $mapper->column('PAYMENT_TYPE', 'payment_type');
+        $mapper->column('EXTERNAL_REFERENCE', 'external_reference'); //nullable
+        $mapper->column('SETTLEMENT_DATE', 'settlement_date')->format([static::class, 'dateFormatter']);
+        $mapper->column('SALES_PACKAGE_PRIVATECODE', 'sales_package_privatecode'); //nullable
         $mapper->column('SALES_PACKAGE_REF', 'sales_package_ref');
         $mapper->column('SALES_PACKAGE_NAME', 'sales_package_name');
-        $mapper->column('DISCOUNT_RIGHT_REF', 'sales_discount_right_ref'); //nullable //UNSURE of type since always empty in csv
-        $mapper->column('DISCOUNT_RIGHT_NAME', 'sales_discount_right_name'); //nullable //UNSURE of type since always empty in csv
-        $mapper->column('USER_PROFILE_REF', 'sales_user_profile_ref');
-        $mapper->column('USER_PROFILE_NAME', 'sales_user_profile_name');
-        $mapper->column('JOURNEY_START_TIME', 'sales_start_time')->format([static::class, 'dateTimeFormatter']);
-        $mapper->column('LEG_FROM_REF', 'sales_from_stop_place'); //might be null
-        $mapper->column('LEG_FROM_NAME', 'sales_from_stop_place_name'); //might be null
-        $mapper->column('LEG_TO_REF', 'sales_to_stop_place'); //might be null
-        $mapper->column('LEG_TO_NAME', 'sales_to_stop_place_name'); // might be null
-        $mapper->column('INTERVAL_ZONE_COUNT', 'sales_zone_count'); // might be null
-        $mapper->column('INTERVAL_ZONES', 'sales_zones_ref'); //might be null
+        $mapper->column('DISCOUNT_RIGHT_REF', 'discount_right_ref'); //nullable //UNSURE of type since always empty in csv
+        $mapper->column('DISCOUNT_RIGHT_NAME', 'discount_right_name'); //nullable //UNSURE of type since always empty in csv
+        $mapper->column('USER_PROFILE_REF', 'user_profile_ref');
+        $mapper->column('USER_PROFILE_NAME', 'user_profile_name');
+        $mapper->column('JOURNEY_START_TIME', 'journey_start_time')->format([static::class, 'dateTimeFormatter']);
+        $mapper->column('LEG_FROM_REF', 'leg_from_ref'); //might be null
+        $mapper->column('LEG_FROM_NAME', 'leg_from_name'); //might be null
+        $mapper->column('LEG_TO_REF', 'leg_to_ref'); //might be null
+        $mapper->column('LEG_TO_NAME', 'leg_to_name'); // might be null
+        $mapper->column('INTERVAL_ZONE_COUNT', 'interval_zone_count'); // might be null
+        $mapper->column('INTERVAL_ZONES', 'interval_zones'); //might be null
 
-        $mapper->column('INTERVAL_DISTANCE', 'sales_interval_distance'); //->nullable();  //Unsure what this is all about!
-        $mapper->column('LEG_SERVICEJOURNEY', 'sales_leg_servicejourney_ref'); //might be null
-        $mapper->column('LEG_SERVICEJOURNEY_PCODE', 'sales_leg_servicejourney_pcode'); //might be null
-        $mapper->column('LEG_LINE_PUBLICCODE', 'sales_leg_line_publiccode'); //->nullable(); //Unsure, since all values are null
-        $mapper->column('ACCT_LEG_LINE_REF', 'sales_leg_line_ref'); //might be null
-        $mapper->column('ACCT_LEG_LINE_NAME', 'sales_leg_line_name'); // missing in data
+        $mapper->column('INTERVAL_DISTANCE', 'interval_distance'); //->nullable();  //Unsure what this is all about!
+        $mapper->column('LEG_SERVICEJOURNEY', 'leg_servicejourney'); //might be null
+        $mapper->column('LEG_SERVICEJOURNEY_PCODE', 'leg_servicejourney_pcode'); //might be null
+        $mapper->column('LEG_LINE_PUBLICCODE', 'leg_line_publiccode'); //->nullable(); //Unsure, since all values are null
+        $mapper->column('ACCT_LEG_LINE_REF', 'acct_leg_line_ref'); //might be null
+        $mapper->column('ACCT_LEG_LINE_NAME', 'acct_leg_line_name'); // missing in data
 
         $mapper->column('ANNEX_TRANSIENT_GUID', 'annex_transient_guid');
         $mapper->column('ANNEX_DESCRIPTION', 'annex_description'); //->nullable(); //missing data
@@ -247,15 +247,15 @@ class EnturSales
         $mapper->column('ANNEX_TAX_CODE', 'annex_tax_code');
         $mapper->column('ANNEX_TAX_RATE', 'annex_tax_rate'); //V
 
-        $mapper->column('ACCT_DATE', 'line_accounting_date')->format([static::class, 'dateFormatter']);
-        $mapper->column('CLEARING_MAPPING_REF', 'line_category_ref');
-        $mapper->column('CLEARING_MAPPING_NAME', 'line_category_description');
+        $mapper->column('ACCT_DATE', 'acct_date')->format([static::class, 'dateFormatter']);
+        $mapper->column('CLEARING_MAPPING_REF', 'clearing_mapping_ref');
+        $mapper->column('CLEARING_MAPPING_NAME', 'clearing_mapping_name');
         $mapper->column('ACCT_AMOUNT', 'acct_amount'); // MIGHT DROP THIS ONE? same as annex_ammount?
-        $mapper->column('CLEARING_CANCELLATION', 'line_cancellation');
-        $mapper->column('ACCT_STANDARD_TAX_CODE', 'line_standard_tax_code');
-        $mapper->column('ACCT_LOCAL_TAX_CODE', 'line_local_tax_code');
-        $mapper->column('ACCT_LOCAL_TAX_RATE', 'line_local_tax_rate');
-        $mapper->column('EST_TAX_AMOUNT', 'line_tax_amount');
+        $mapper->column('CLEARING_CANCELLATION', 'clearing_cancellation');
+        $mapper->column('ACCT_STANDARD_TAX_CODE', 'acct_standard_tax_code');
+        $mapper->column('ACCT_LOCAL_TAX_CODE', 'acct_local_tax_code');
+        $mapper->column('ACCT_LOCAL_TAX_RATE', 'acct_local_tax_rate');
+        $mapper->column('EST_TAX_AMOUNT', 'est_tax_amount');
 
 
 

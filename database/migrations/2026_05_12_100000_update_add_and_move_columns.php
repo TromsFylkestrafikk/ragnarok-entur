@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('entitlement_given_name')->after('entitlement_given_ref');
         });
 
-        Schema::table('entur_product_sales', function (Blueprint $table) {
+        /*Schema::table('entur_product_sales', function (Blueprint $table) {
             $table->string('chunk_id')->change()->after('id');
             $table->string('agreement_org_no')->change()->after('agreement_owner_org_name');
             $table->date('settlement_date')->change()->after('settlement_number');
@@ -60,7 +60,7 @@ return new class extends Migration
             $table->integer('annex_tax_code')->change()->after('annex_tax_rate');
             $table->string('acct_amount')->change()->after('clearing_cancellation');
             $table->date('acct_date')->change()->after('acct_amount');
-        });
+        });*/
     }
 
     /**

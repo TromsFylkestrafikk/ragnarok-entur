@@ -268,7 +268,7 @@ class EnturSales
         $mapper->column('POS_SUPPLIER_NAME', 'pos_supplier_name');
         $mapper->column('SETTLEMENT_NUMBER', 'settlement_number');
         $mapper->column('SETTLEMENT_EXTERNAL_NUMBER', 'settlement_external_number');
-        $mapper->column('SETTLEMENT_EXTERNAL_DATE', 'settlement_external_date');
+        $mapper->column('SETTLEMENT_EXTERNAL_DATE', 'settlement_external_date')->format([static::class, 'dateFormatter']);
         $mapper->column('TRANSACTION_TIMESTAMP', 'transaction_timestamp');
         $mapper->column('FARE_PRODUCT_REF', 'fare_product_ref');
         $mapper->column('FARE_PRODUCT_NAME', 'fare_product_name');

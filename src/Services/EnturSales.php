@@ -257,7 +257,28 @@ class EnturSales
         $mapper->column('ACCT_LOCAL_TAX_RATE', 'acct_local_tax_rate');
         $mapper->column('EST_TAX_AMOUNT', 'est_tax_amount');
 
-
+        $mapper->column('ROW_ID', 'row_id');
+        $mapper->column('ACCT_MONTH_ID', 'acct_month_id');
+        $mapper->column('AGREEMENT_OWNER_ORG_REF', 'agreement_owner_org_ref');
+        $mapper->column('AGREEMENT_OWNER_ORG_NAME', 'agreement_owner_org_name');
+        $mapper->column('AGREEMENT_ID', 'agreement_id');
+        $mapper->column('AGREEMENT_CODE', 'agreement_code');
+        $mapper->column('DISTRIBUTION_CHANNEL_NAME', 'distribution_channel_name');
+        $mapper->column('POS_PROVIDER_NAME', 'pos_provider_name');
+        $mapper->column('POS_SUPPLIER_NAME', 'pos_supplier_name');
+        $mapper->column('SETTLEMENT_NUMBER', 'settlement_number');
+        $mapper->column('SETTLEMENT_EXTERNAL_NUMBER', 'settlement_external_number');
+        $mapper->column('SETTLEMENT_EXTERNAL_DATE', 'settlement_external_date');
+        $mapper->column('TRANSACTION_TIMESTAMP', 'transaction_timestamp');
+        $mapper->column('FARE_PRODUCT_REF', 'fare_product_ref');
+        $mapper->column('FARE_PRODUCT_NAME', 'fare_product_name');
+        $mapper->column('GROUP_JSON', 'group_json');
+        $mapper->column('FARE_PRODUCT_AUTHORITY_REF', 'fare_product_authority_ref');
+        $mapper->column('FARE_PRODUCT_AUTHORITY_NAME', 'fare_product_authority_name');
+        $mapper->column('USAGE_VALIDITY_REF', 'usage_validity_ref');
+        $mapper->column('USAGE_VALIDITY_NAME', 'usage_validity_name');
+        $mapper->column('ENTITLEMENT_GIVEN_REF', 'entitlement_given_ref');
+        $mapper->column('ENTITLEMENT_GIVEN_NAME', 'entitlement_given_name');
 
         return $mapper->exec()->logSummary()->getProcessedRecords();
     }

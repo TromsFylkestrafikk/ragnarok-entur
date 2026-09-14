@@ -12,10 +12,10 @@ return new class extends Migration {
     {
         //
         Schema::table('entur_product_sales', function (Blueprint $table) {
-            $table->string('special_order_cause');
-            $table->string('special_order_org_ref');
-            $table->string('special_order_org_name');
-            $table->string('special_order_related_id');
+            $table->string('special_order_cause')->nullable();
+            $table->string('special_order_org_ref')->nullable();
+            $table->string('special_order_org_name')->nullable();
+            $table->string('special_order_related_id')->nullable();
         });
 
         Schema::table('entur_product_sales', function (Blueprint $table) {

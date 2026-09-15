@@ -190,6 +190,16 @@ class EnturSales
 
         // use ($chunkId) - to make $chunkId available inside the preInsertRecord callback function
         $mapper->preInsertRecord(function ($csvRec, &$dbRec) use ($chunkId) {
+
+            // Patch from 1056 to 1142 (if data needs to be reimported from file)
+            if (isset($csvRec['POS_REF']) && !isset($csvRec['POS_INTERNALREF'])) {
+                $dbRec['pos_internalref'] = $csvRec['POS_REF'];
+            }
+            if (isset($csvRec['EST_TAX_AMOUNT']) && !isset($csvRec['TAX_AMOUNT'])) {
+                $dbRec['tax_amount'] = $csvRec['EST_TAX_AMOUNT'];
+            }
+
+            // manually inster chunk_id since it is not part of the csv
             $dbRec['chunk_id'] = $chunkId;
         });
 

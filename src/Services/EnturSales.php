@@ -190,6 +190,16 @@ class EnturSales
 
         // use ($chunkId) - to make $chunkId available inside the preInsertRecord callback function
         $mapper->preInsertRecord(function ($csvRec, &$dbRec) use ($chunkId) {
+
+            // Patch from 1056 to 1142 (if data needs to be reimported from file)
+            if (isset($csvRec['POS_REF']) && !isset($csvRec['POS_INTERNALREF'])) {
+                $dbRec['pos_internalref'] = $csvRec['POS_REF'];
+            }
+            if (isset($csvRec['EST_TAX_AMOUNT']) && !isset($csvRec['TAX_AMOUNT'])) {
+                $dbRec['tax_amount'] = $csvRec['EST_TAX_AMOUNT'];
+            }
+
+            // manually inster chunk_id since it is not part of the csv
             $dbRec['chunk_id'] = $chunkId;
         });
 
@@ -205,7 +215,8 @@ class EnturSales
 
         $mapper->column('POS_PROVIDER_REF', 'pos_provider_ref');
         $mapper->column('POS_SUPPLIER_REF', 'pos_supplier_ref');
-        $mapper->column('POS_REF', 'pos_ref');
+        //$mapper->column('POS_REF', 'pos_ref');
+        $mapper->column('POS_INTERNALREF', 'pos_internalref');
         $mapper->column('POS_NAME', 'pos_name'); //nullable
         $mapper->column('POS_LOCATION_REF', 'pos_location_ref'); //nullable
         $mapper->column('POS_LOCATION_NAME', 'pos_location_name'); //nullable
@@ -255,7 +266,8 @@ class EnturSales
         $mapper->column('ACCT_STANDARD_TAX_CODE', 'acct_standard_tax_code');
         $mapper->column('ACCT_LOCAL_TAX_CODE', 'acct_local_tax_code');
         $mapper->column('ACCT_LOCAL_TAX_RATE', 'acct_local_tax_rate');
-        $mapper->column('EST_TAX_AMOUNT', 'est_tax_amount');
+        //$mapper->column('EST_TAX_AMOUNT', 'est_tax_amount');
+        $mapper->column('TAX_AMOUNT', 'tax_amount');
 
         $mapper->column('ROW_ID', 'row_id');
         $mapper->column('ACCT_MONTH_ID', 'acct_month_id');
@@ -279,6 +291,12 @@ class EnturSales
         $mapper->column('USAGE_VALIDITY_NAME', 'usage_validity_name');
         $mapper->column('ENTITLEMENT_GIVEN_REF', 'entitlement_given_ref');
         $mapper->column('ENTITLEMENT_GIVEN_NAME', 'entitlement_given_name');
+
+        // 2026-09-14
+        $mapper->column('SPECIAL_ORDER_CAUSE', 'special_order_cause');
+        $mapper->column('SPECIAL_ORDER_ORG_REF', 'special_order_org_ref');
+        $mapper->column('SPECIAL_ORDER_ORG_NAME', 'special_order_org_name');
+        $mapper->column('SPECIAL_ORDER_RELATED_ID', 'special_order_related_id');
 
         return $mapper->exec()->logSummary()->getProcessedRecords();
     }

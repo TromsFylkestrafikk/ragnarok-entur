@@ -217,10 +217,8 @@ class EnturSales
         $mapper->column('POS_SUPPLIER_REF', 'pos_supplier_ref');
         //$mapper->column('POS_REF', 'pos_ref');
         $mapper->column('POS_INTERNALREF', 'pos_internalref');
-        $mapper->column('POS_NAME', 'pos_name'); //nullable
         $mapper->column('POS_LOCATION_REF', 'pos_location_ref'); //nullable
         $mapper->column('POS_LOCATION_NAME', 'pos_location_name'); //nullable
-        $mapper->column('POS_PRIVATECODE', 'pos_privatecode'); //nullable
 
         $mapper->column('TRANSACTION_TYPE', 'transaction_type');
 

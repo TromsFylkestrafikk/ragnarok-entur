@@ -13,6 +13,7 @@ class SinkEnturSales extends SinkBase
     public static $id = "entur-sales";
     public static $title = "Entur Salesdata";
     public $cron = '30 04 * * *';
+    public $cronRefetch = '30 20 5 * *';
     public static $docfileName = "docs/SINK-SALES.md";
 
     protected $service;
@@ -24,6 +25,9 @@ class SinkEnturSales extends SinkBase
         $this->service = new EnturSales();
     }
 
+    /**
+    * @inheritdoc
+    */
     public function import(string $chunkId, SinkFile $file): int
     {
         return $this->service->import($chunkId, $file);
@@ -32,7 +36,7 @@ class SinkEnturSales extends SinkBase
     /**
      * @inheritdoc
      */
-    public function fetch(string $id): SinkFile|null
+    public function fetch(string $id): ?SinkFile
     {
         return $this->service->download($id);
     }
@@ -52,6 +56,9 @@ class SinkEnturSales extends SinkBase
         return true;
     }
 
+    /**
+    * @inheritdoc
+    */
     public function destinationTables(): array
     {
         return $this->service->destinationTables();
@@ -72,5 +79,16 @@ class SinkEnturSales extends SinkBase
     public function getToDate(): Carbon
     {
         return Carbon::today();
+    }
+
+    /**
+    * @inheritdoc
+    */
+    public function refetchIdRange(): array
+    {
+        return [
+            today()->subWeek()->startOfWeek()->format('Y-m-d'),
+            today()->subDay()->format('Y-m-d'),
+        ];
     }
 }

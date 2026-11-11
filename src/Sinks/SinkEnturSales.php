@@ -87,8 +87,8 @@ class SinkEnturSales extends SinkBase
     public function refetchIdRange(): array
     {
         return [
-            today()->subWeek()->startOfWeek()->format('Y-m-d'),
-            today()->subDay()->format('Y-m-d'),
+            today()->startOfMonth()->format('Y-m-d'),
+            today()->format('Y-m-d'),
         ];
     }
 }
